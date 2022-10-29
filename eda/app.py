@@ -42,11 +42,13 @@ def read_data(data):
     """
    converts string to pandas dataframe
     """
-
+    has_data = False
     for line in data.splitlines():
         if line.startswith("MeteringpointID"):
+            has_data = True
             continue
-        yield line.split(",")[0].split("\t"), line.split(",")[1:]
+        if has_data:
+            yield line.split(",")
 
 
 def analyze(data_df, metering_point):
@@ -55,25 +57,10 @@ def analyze(data_df, metering_point):
     """
 
     # rename columns to be used in calculations
-    data_df.columns = [
-        "day",
-        "1_l1_a",
-        "1_l1_r",
-        "1_l1_s",
-        "1_l2_a",
-        "1_l2_r",
-        "1_l2_s",
-        "2_l1_a",
-        "2_l1_r",
-        "2_l1_s",
-        "2_l2_a",
-        "2_total_a",
-        "2_total_r",
-        "2_total_s",
-    ]
+    data_df.index.names = ['day']
 
     # select one metering point
-    data_df = data_df[["day", "2_l2_a"]]
+    data_df = data_df.iloc[:, 0:4]
 
     # sum values per day
     data_df = data_df.groupby(["day"]).sum()
@@ -93,7 +80,8 @@ def analyze(data_df, metering_point):
     # print(data_df)
     return data_df
 
-df = pd.DataFrame(list(read_data(data)))
+my_data = list(read_data(data))
+df = pd.DataFrame(my_data)
 df = df.apply(pd.to_numeric, errors='ignore')
 
 #print(df)
