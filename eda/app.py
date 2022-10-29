@@ -48,25 +48,34 @@ def read_data(data):
             has_data = True
             continue
         if has_data:
-            yield line.split(",")
+            data = line.split(",")
+            yield data
 
 
-def analyze(data_df, metering_point):
+def to_df(data):
+    df = pd.DataFrame(data)
+    df[0] = pd.to_datetime(df[0])
+    df = df.set_index(0)
+    df = df.apply(pd.to_numeric)
+    return df
+
+
+def group_by_day(df):
+     df = df.groupby(df.index.date).sum()
+     return df
+
+
+def analyze(df, metering_point):
     """
     use pandas to aggregate metering data per day
     """
 
-    # rename columns to be used in calculations
-    data_df.index.names = ['day']
-
     # select one metering point
-    data_df = data_df.iloc[:, 0:4]
+    df = df.iloc[:, 0:4].copy()
 
     # sum values per day
     data_df = data_df.groupby(["day"]).sum()
 
-    # reset index to use as dataframe column
-    data_df = data_df.reset_index()
 
     # rename columns to be used later on
     data_df.columns = ["day", "total_energy"]
