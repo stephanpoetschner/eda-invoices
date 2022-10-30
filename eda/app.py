@@ -38,22 +38,26 @@ MeteringpointID,AT9990000991100000000000209351633,AT9990000991100000000000209351
 01.01.2021 08:00:00,0.068000,0.000000,0.000000,0.002000,0.000000,0.000000,0.139000,0.000000,0.000000,0.000000,0.209000,0.000000,0.000000
 """
 
+
 def read_data(data):
     """
    converts string to pandas dataframe
     """
     has_data = False
     for line in data.splitlines():
+        data = line.split(",")
         if line.startswith("MeteringpointID"):
             has_data = True
-            continue
         if has_data:
-            data = line.split(",")
             yield data
 
 
 def to_df(data):
     df = pd.DataFrame(data)
+    new_header = df.iloc[0]  # grab the first row for the header
+    df = df[1:]  # take the data less the header row
+    df.columns = new_header  # set the header row as the df header
+
     df[0] = pd.to_datetime(df[0])
     df = df.set_index(0)
     df = df.apply(pd.to_numeric)
@@ -61,8 +65,8 @@ def to_df(data):
 
 
 def group_by_day(df):
-     df = df.groupby(df.index.date).sum()
-     return df
+    df = df.groupby(df.index.date).sum()
+    return df
 
 
 def analyze(df, metering_point):
@@ -74,24 +78,24 @@ def analyze(df, metering_point):
     df = df.iloc[:, 0:4].copy()
 
     # sum values per day
-    data_df = data_df.groupby(["day"]).sum()
+    df = df.groupby(["day"]).sum()
 
 
     # rename columns to be used later on
-    data_df.columns = ["day", "total_energy"]
+    df.columns = ["day", "total_energy"]
 
     # convert to kWh from Wh
-    data_df["total_energy"] = data_df["total_energy"] / 1000
+    df["total_energy"] = df["total_energy"] / 1000
 
     # set decimal places
-    data_df["total_energy"] = data_df["total_energy"].round(2)
+    df["total_energy"] = df["total_energy"].round(2)
 
     # print(data_df)
-    return data_df
+    return df
+
 
 my_data = list(read_data(data))
-df = pd.DataFrame(my_data)
-df = df.apply(pd.to_numeric, errors='ignore')
+df = to_df(my_data)
 
 #print(df)
 print(analyze(df, "AT9990000991100000000000209351633"))
