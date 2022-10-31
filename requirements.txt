@@ -1,1 +1,7 @@
 pandas
+pyyaml
+Django==3.2
+
+ipdb
+ipython
+click
