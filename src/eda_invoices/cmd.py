@@ -1,20 +1,25 @@
 import click
-import yaml
+import pandas as pd
 from eda_invoices.calculations.calc import parse_data
+from eda_invoices.costumers.utils import read_config
 
 
 @click.command()
-@click.argument('yaml_conf, file', type=click.Path(exists=True))
-@click.argument('eda_export_file', type=click.Path(exists=True))
-def cmd(yaml_conf_file, eda_export_file):
-    with open(yaml_conf_file) as f:
-        configuration = yaml.safe_load(f)
-    import ipdb; ipdb.set_trace
-    for df in parse_data(eda_export_file):
+@click.argument('yaml_conf', type=click.Path(exists=True))
+@click.argument('eda_export', type=click.Path(exists=True))
+def run(yaml_conf, eda_export):
+    config = read_config(yaml_conf)
 
-        print(df)
-        import ipdb;ipdb.set_trace()
+    all_metering_data = dict(parse_data(eda_export))
+
+    for customer in config['customers']:
+        metering_data = {
+            point: all_metering_data.get(point, pd.DataFrame())
+            for point in customer.metering_points
+        }
+        print(customer)
+        print(metering_data)
 
 
 if __name__ == '__main__':
-    cmd()
+    run()
