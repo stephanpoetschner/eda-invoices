@@ -1,17 +1,6 @@
-import click
 import pandas as pd
 
-
-def read_file(filename):
-    with open(filename) as f:
-        for line in f:
-            yield line.rstrip('\n')
-
-
-def split_lines(lines):
-    for line in lines:
-        columns = line.split(",")
-        yield columns
+from eda_invoices.calculations.utils import read_file, split_lines
 
 
 def filter_rows(rows):
@@ -56,7 +45,7 @@ def split_df(df):
     return df, df_left
 
 
-def get_data(filename):
+def parse_data(filename):
     data = read_file(filename)
     data = split_lines(data)
     data = filter_rows(data)
@@ -68,28 +57,20 @@ def get_data(filename):
 
     df_left = df
     headers_left = headers
-    import ipdb; ipdb.set_trace()
-    while not df_left.empty:
-        next_data_type = headers_left.iloc[1, 1]
+    while not headers_left.empty:
+        next_data_type = headers_left.iloc[1, 0]
         if next_data_type == 'CONSUMPTION':
             headers, headers_left = split_df(headers_left)
-            assert len(set(headers.iloc[0,:])) == 1
+            metering_id = set(headers.iloc[0,:])
+            assert len(metering_id) == 1
+            metering_id = metering_id.pop()
+
             assert set(headers.iloc[1,:]) == {'CONSUMPTION'}
 
             df, df_left = split_df(df_left)
             df.columns = ['total_consumption', 'internal_available', 'internal_consumption']
 
-            yield df, headers
-        elif next_data_type == 'GENERATION':
+            yield metering_id, df
+        elif next_data_type in ['GENERATION', '']:
             # ignore generation columns for now
-            ...
-
-
-@click.command()
-@click.argument('filename', type=click.Path(exists=True))
-def cmd(filename):
-    print(list(get_data(filename)))
-
-
-if __name__ == '__main__':
-    cmd()
+            headers_left = headers_left.iloc[:,1:]

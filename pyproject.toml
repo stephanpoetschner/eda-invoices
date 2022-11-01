@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "eda_invoices"
+version = "0.1.0"
+description = ""
+authors = ["Stephan Poetschner <stephan.poetschner@gmail.com>"]
+license = "mit"
+packages = [
+    { include = "eda_invoices", from = "src" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+PyYAML = "^6.0"
+pytz = "^2021.3"
+pandas = "^1.4.1"
+django = "3.2"
+
+[tool.poetry.dev-dependencies]
+ipython = "^8.1.1"
+pytest = "^7.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
