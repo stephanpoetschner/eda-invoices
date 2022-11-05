@@ -4,10 +4,16 @@ from eda_invoices.calculations.calc import parse_data
 from eda_invoices.costumers.utils import read_config
 
 
-@click.command()
+@click.group()
+@click.version_option()
+def cli():
+    "Command line tool to analyze CSV data from https://www.eda.at/anwenderportal"
+
+
+@cli.command(name="calc")
 @click.argument('yaml_conf', type=click.Path(exists=True))
 @click.argument('eda_export', type=click.Path(exists=True))
-def run(yaml_conf, eda_export):
+def calc_metering_data(yaml_conf, eda_export):
     config = read_config(yaml_conf)
 
     all_metering_data = dict(parse_data(eda_export))
@@ -20,6 +26,3 @@ def run(yaml_conf, eda_export):
         print(customer)
         print(metering_data)
 
-
-if __name__ == '__main__':
-    run()

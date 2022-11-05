@@ -14,6 +14,7 @@ customers:
 - email: max.mustermann@example.com
   name: Max Mustermann
   customer_id: 12345678
+  tariffs: default_consumption
   address:
     line: Beispielstraße 24
     post_code: 1010
@@ -21,3 +22,16 @@ customers:
   metering_points:
     - AT9990000991100000000000209351633
     - AT9990000991100000000000209351644
+tariffs:
+  - name: default_consumption
+    prices:
+      - price: 15.0
+        date: 2022-11-02
+  - name: default_generation
+    direction: generation
+    prices:
+      - price: 14.0
+        date: 2022-11-02
+
+
+
