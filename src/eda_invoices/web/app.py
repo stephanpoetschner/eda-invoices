@@ -30,7 +30,7 @@ settings.configure(
     DEBUG=config('DEBUG', cast=bool, default=True),
     ALLOWED_HOSTS=config('DEBUG', default="*").split(";"),  # e.g. www.example.com;example.com
     ROOT_URLCONF=__name__,
-    WSGI_APPLICATION = 'eda_invoices.web.wsgi.application',
+    WSGI_APPLICATION='eda_invoices.web.wsgi.application',
     MIDDLEWARE=[],
     INSTALLED_APPS=[
         'django.contrib.sessions',
