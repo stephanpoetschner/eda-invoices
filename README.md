@@ -23,6 +23,7 @@
 
     # install pre-commit hooks
     $ pre-commit install
+    $ pre-commit
 
     # run tests
     $ poetry run pytest
