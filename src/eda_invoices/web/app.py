@@ -54,6 +54,14 @@ settings.configure(
             },
         },
     ],
+    STATICFILES_STORAGE=config(
+        "STATICFILES_STORAGE",
+        default="django.contrib.staticfiles.storage.StaticFilesStorage",
+    ),
+    STATICFILES_DIRS=[
+        BASE_DIR / "static",
+    ],
+    STATIC_ROOT=config("STATIC_ROOT", default=BASE_DIR / "staticfiles"),
     STATIC_URL="/static/",
     LANGUAGE_CODE="en-us",
     TIME_ZONE="UTC",
