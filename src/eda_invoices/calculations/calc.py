@@ -7,7 +7,11 @@ def filter_rows(rows):
     yield_data_row = False
     for columns in rows:
         # select the lines to keep
-        if columns and columns[0] in ["MeteringpointID", "Energy direction", "Metercode"]:
+        if columns and columns[0] in [
+            "MeteringpointID",
+            "Energy direction",
+            "Metercode",
+        ]:
             yield columns
         # find last line, before data rows begin
         elif columns and columns[0] in ["Spaltensumme"]:
@@ -59,18 +63,22 @@ def parse_data(filename):
     headers_left = headers
     while not headers_left.empty:
         next_data_type = headers_left.iloc[1, 0]
-        if next_data_type == 'CONSUMPTION':
+        if next_data_type == "CONSUMPTION":
             headers, headers_left = split_df(headers_left)
-            metering_id = set(headers.iloc[0,:])
+            metering_id = set(headers.iloc[0, :])
             assert len(metering_id) == 1
             metering_id = metering_id.pop()
 
-            assert set(headers.iloc[1,:]) == {'CONSUMPTION'}
+            assert set(headers.iloc[1, :]) == {"CONSUMPTION"}
 
             df, df_left = split_df(df_left)
-            df.columns = ['total_consumption', 'internal_available', 'internal_consumption']
+            df.columns = [
+                "total_consumption",
+                "internal_available",
+                "internal_consumption",
+            ]
 
             yield metering_id, df
-        elif next_data_type in ['GENERATION', '']:
+        elif next_data_type in ["GENERATION", ""]:
             # ignore generation columns for now
-            headers_left = headers_left.iloc[:,1:]
+            headers_left = headers_left.iloc[:, 1:]
