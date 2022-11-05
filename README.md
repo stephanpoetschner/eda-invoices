@@ -23,7 +23,6 @@
 
     # install pre-commit hooks
     $ pre-commit install
-    $ pre-commit
 
     # run tests
     $ poetry run pytest
@@ -38,4 +37,3 @@ You may want to build packages for production use. Just run:
     poetry build
 
 And see `dist`-folder.
-
