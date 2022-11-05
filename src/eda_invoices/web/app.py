@@ -9,6 +9,9 @@ from django.shortcuts import render
 
 BASE_DIR = pathlib.Path(__file__).parent.resolve()
 
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
+
 
 # views
 def home(request):
@@ -22,11 +25,17 @@ urlpatterns = [
 
 # settings
 settings.configure(
-    SECRET_KEY=config('SECRET_KEY', "some-random-key"),
+    # SECURITY WARNING: keep the secret key used in production secret!
+    SECRET_KEY=config('SECRET_KEY', "django-insecure-$$*z)a47oh#tgihk25$ddvxt!jd)am5b3!px3a3)%j*0k$10v8"),
     DEBUG=config('DEBUG', cast=bool, default=True),
-    ALLOWED_HOSTS=config('DEBUG', default="").split(";"),  # e.g. www.example.com;example.com
+    ALLOWED_HOSTS=config('DEBUG', default="*").split(";"),  # e.g. www.example.com;example.com
     ROOT_URLCONF=__name__,
+    WSGI_APPLICATION = 'eda_invoices.web.wsgi.application',
     MIDDLEWARE=[],
+    INSTALLED_APPS=[
+        'django.contrib.sessions',
+        'django.contrib.staticfiles',
+    ],
     TEMPLATES=[
         {
             'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -40,6 +49,12 @@ settings.configure(
             },
         },
     ],
+    STATIC_URL='/static/',
+    LANGUAGE_CODE='en-us',
+    TIME_ZONE='UTC',
+    USE_I18N=True,
+    USE_L10N=True,
+    USE_TZ=True,
 )
 
 # run the app
