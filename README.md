@@ -21,6 +21,9 @@
     # install current project
     $ pip install -e .
 
+    # install pre-commit hooks
+    $ pre-commit install
+
     # run tests
     $ poetry run pytest
 
