@@ -21,9 +21,11 @@ python-decouple = "^3.6"
 [tool.poetry.scripts]
 eda_invoices_cli = 'eda_invoices.cli:cli'
 
+[tool.poetry.group.test.dependencies]
+pytest = "^7.0.1"
+
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.1.1"
-pytest = "^7.0.1"
 ipdb = "^0.13.9"
 pre-commit = "^2.20.0"
 black = "^22.10.0"
