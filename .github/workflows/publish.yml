@@ -51,11 +51,11 @@ jobs:
     - name: Install dependencies
       run: |
         pip install setuptools wheel twine build
-    - name: Publish
-      env:
-        TWINE_USERNAME: __token__
-        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
-      run: |
-        python -m build
-        twine upload dist/*
+#    - name: Publish
+#      env:
+#        TWINE_USERNAME: __token__
+#        TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+#      run: |
+#        python -m build
+#        twine upload dist/*
 
