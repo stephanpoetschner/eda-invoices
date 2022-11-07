@@ -1,6 +1,7 @@
 import pandas as pd
 
-from eda_invoices.calculations.utils import read_file, split_lines
+from eda_invoices.calculations.utils import read_file
+from eda_invoices.calculations.utils import split_lines
 
 
 def filter_rows(rows):
@@ -49,7 +50,7 @@ def split_df(df):
     return df, df_left
 
 
-def parse_data(filename):
+def parse_raw_data(filename):
     data = read_file(filename)
     data = split_lines(data)
     data = filter_rows(data)
@@ -58,7 +59,10 @@ def parse_data(filename):
 
     headers = headers.iloc[:, 1:]  # strip first column from headers
     df = group_by_day(df)
+    return headers, df
 
+
+def split_by_metering_point(headers, df):
     df_left = df
     headers_left = headers
     while not headers_left.empty:

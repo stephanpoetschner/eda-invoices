@@ -7,10 +7,10 @@ For more information on this file, see
 https://docs.djangoproject.com/en/3.2/howto/deployment/wsgi/
 """
 
-import os
-
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "eda_invoices.web.app")
+from eda_invoices.web import app
+
+app.setup()
 
 application = get_wsgi_application()

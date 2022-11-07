@@ -1,6 +1,8 @@
 from dataclasses import field
+from typing import List
+from typing import Optional
+
 from pydantic.dataclasses import dataclass
-from typing import Optional, List
 
 
 @dataclass
@@ -9,6 +11,20 @@ class Address:
     post_code: str
     city: str
 
+    @property
+    def post_city(self):
+        return f"{self.post_code} {self.city}"
+
+    @property
+    def short(self):
+        return f"{self.line}, {self.post_city}"
+
+
+@dataclass
+class MeteringPoint:
+    point_id: str
+    name: str
+
 
 @dataclass
 class Customer:
@@ -16,7 +32,7 @@ class Customer:
     name: str
     customer_id: str
     address: Address
-    metering_points: Optional[List[str]] = field(default_factory=lambda: [])
+    metering_points: Optional[List[MeteringPoint]] = field(default_factory=lambda: [])
 
 
 @dataclass

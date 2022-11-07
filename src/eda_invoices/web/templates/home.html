@@ -16,6 +16,47 @@
   </head>
 
   <body>
+    <div>
+      {{ sender.name }} {{ sender.address.short }}
+    </div>
+
+    <div>
+      {{ customer.name }}<br>
+      {{ customer.address.line }}<br>
+      {{ customer.address.post_city }}
+    </div>
+
+    <div>
+      So erreichen Sie uns<br>
+      <br>
+      <ul>
+        <li>E-Mail: {{ sender.email }}</li>
+        <li>Tel: {{ sender.phone }}</li>
+      </ul>
+    </div>
+
+    <div>
+      <strong>Ihre Rechnungsdaten</strong>
+      <ul>
+        <li>Kund:innen-Nummer: {{ customer.customer_id }}</li>
+        <li>Rechnungsnummer: 1234567890123</li>
+        <li>Rechnungsdatum: 24.09.2021</li>
+      </ul>
+    </div>
+
+    <div>
+      <h1>Abrechnung - Strom</h1>
+      {% for point, data in metering_data %}
+        Anlagenadresse: {{ point.name }}<br>
+        Abrechnungszeitraum: {{ starts_at|date:"SHORT_DATE_FORMAT" }} - {{ stops_at|date:"SHORT_DATE_FORMAT" }}<br>
+        Stromverbrauch aus EEG: {{ data.internal_consumption.sum|floatformat:2 }} kWh
+        <small>(Stromverbrauch Gesamt: {{ data.total_consumption.sum|floatformat:2 }} kWh)</small>
+        {% if not forloop.last %}<hr>{% endif %}
+      {% endfor %}
+      <br><br>
+      Ihre Gesamtkosten:
+    </div>
+
 
     <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
       <a class="navbar-brand" href="#">Navbar</a>

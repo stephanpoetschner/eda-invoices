@@ -20,8 +20,10 @@ customers:
     post_code: 1010
     city: Wien
   metering_points:
-    - AT9990000991100000000000209351633
-    - AT9990000991100000000000209351644
+    - point_id: AT9990000991100000000000209351633
+      name: Max Mustermann, Beispielstraße 24, 1010 Wien
+    - point_id: AT9990000991100000000000209351644
+      name: Max Mustermann, Beispielstraße 1, 8010 Graz
 tariffs:
   - name: default_consumption
     prices:
@@ -32,6 +34,3 @@ tariffs:
     prices:
       - price: 14.0
         date: 2022-11-02
-
-
-
