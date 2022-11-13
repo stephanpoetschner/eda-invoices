@@ -7,6 +7,7 @@ import pandas as pd
 from django.template import loader
 from django.utils.text import slugify
 
+from eda_invoices.calculations.calc import group_by_month
 from eda_invoices.calculations.calc import parse_raw_data
 from eda_invoices.calculations.calc import split_by_metering_point
 from eda_invoices.costumers.utils import read_config
@@ -32,22 +33,45 @@ def calc_metering_data(yaml_conf, dst, eda_export):
     dst = pathlib.Path(dst)
 
     config = read_config(yaml_conf)
-    headers, df = parse_raw_data(eda_export)
+    df = parse_raw_data(eda_export)
 
-    all_metering_data = dict(split_by_metering_point(headers, df))
+    starts_at: datetime.date = (df.index[0]).date()
+    stops_at: datetime.date = (df.index[-1]).date()
 
-    starts_at: datetime.date = df.index[0]
-    stops_at: datetime.date = df.index[-1]
+    # prices_consumption = pd.DataFrame(
+    #     {"prices_buying": [0.1, 0.5]},
+    #     index=[
+    #         pd.Timestamp("01-01-21 13:30:00.023"),
+    #         pd.Timestamp("01-01-25 13:30:00.023"),
+    #     ],
+    # )
+    #
+    # prices_generation = pd.DataFrame(
+    #     {"prices_selling": [0.4]},
+    #     index=[
+    #         pd.Timestamp("01-01-21 13:30:00.023"),
+    #     ],
+    # )
+    # if energy_direction == "CONSUMPTION":
+    #     data = add_prices(data, prices_consumption)
+    # elif energy_direction == "GENERATION":
+    #     data = add_prices(data, prices_generation)
 
+    df = group_by_month(df)
+    all_metering_data = split_by_metering_point(df)
     for customer in config["customers"]:
         filename = (
             f"{slugify(customer.customer_id)} -"
             f" {starts_at.isoformat()}-{stops_at.isoformat()} .html"
         )
-        metering_data = [
-            (point, all_metering_data.get(point.point_id, pd.DataFrame()))
-            for point in customer.metering_points
-        ]
+        metering_data = []
+        for point in customer.metering_points:
+            energy_direction, data = all_metering_data.get(
+                point.point_id, (None, pd.DataFrame())
+            )
+            metering_data.append((point, data))
+
+        total_pricing_data = None
         print(customer)
         print(metering_data)
 
@@ -57,9 +81,12 @@ def calc_metering_data(yaml_conf, dst, eda_export):
                 {
                     "sender": config["sender"],
                     "customer": customer,
-                    "metering_data": metering_data,
                     "starts_at": starts_at,
                     "stops_at": stops_at,
+                    "metering_data": metering_data,
+                    "total_pricing_data": total_pricing_data,
+                    "invoice_number": "1234567890123",
+                    "invoice_date": datetime.date.today(),
                 },
             )
             f.write(html_output)

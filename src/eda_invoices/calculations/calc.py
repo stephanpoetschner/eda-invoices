@@ -1,3 +1,5 @@
+import collections
+
 import pandas as pd
 
 from eda_invoices.calculations.utils import read_file
@@ -21,25 +23,53 @@ def filter_rows(rows):
             yield columns
 
 
-def to_df(data):
-    HEADER_COUNT = 3
-
+def to_df(data, header_row_count=3):
     df = pd.DataFrame(data)
+    df = df.set_index(0)
 
-    # strip TOTALS
-    df = df.iloc[:, :-3]
+    for label, description in (
+        (
+            "total_consumption",
+            "Gesamtverbrauch lt. Messung (bei Teilnahme gem. Erzeugung) [KWH]",
+        ),
+        ("local_availability", "Eigendeckung gemeinschaftliche Erzeugung [KWH]"),
+        ("local_consumption", "Anteil gemeinschaftliche Erzeugung [KWH]"),
+    ):
+        df.loc["Metercode"] = df.loc["Metercode"].replace(description, label)
+
+    items = []
+    for x in range(header_row_count):
+        items += [df.iloc[x].values.tolist()]
+    df.columns = list(zip(*items))
 
     # split headers and data
-    headers, df = df[:HEADER_COUNT], df[HEADER_COUNT:]
+    df = df[header_row_count:]
 
-    df[0] = pd.to_datetime(df[0])
-    df = df.set_index(0)
+    # re-index on datetime
+    # use `infer_datetime_format=True` if format is unknown, instead of `format=...`
+    df.index = pd.to_datetime(df.index, format="%d.%m.%Y %H:%M:%S")
+    df = df.sort_index()
+
+    # strip TOTALS
+    selected_columns = [x[0] for x in df.columns.values.tolist()]
+    selected_columns = [True if x == "TOTAL" else False for x in selected_columns]
+    df = df.drop(df.columns[selected_columns], axis=1)
+
+    # convert all table cells to type numeric
     df = df.apply(pd.to_numeric)
-    return df, headers
+    return df
 
 
-def group_by_day(df):
-    df = df.groupby(df.index.date).sum()
+def group_by_month(df):
+    df = df.groupby(by=[df.index.month, df.index.year]).sum()
+    return df
+
+
+def add_prices(df, prices):
+    df = df.sort_index()
+    df = pd.merge_asof(
+        df, prices, left_index=True, right_index=True, direction="backward"
+    )
     return df
 
 
@@ -55,34 +85,28 @@ def parse_raw_data(filename):
     data = split_lines(data)
     data = filter_rows(data)
     data = list(data)
-    df, headers = to_df(data)
+    df = to_df(data)
 
-    headers = headers.iloc[:, 1:]  # strip first column from headers
-    df = group_by_day(df)
-    return headers, df
+    return df
 
 
-def split_by_metering_point(headers, df):
-    df_left = df
-    headers_left = headers
-    while not headers_left.empty:
-        next_data_type = headers_left.iloc[1, 0]
-        if next_data_type == "CONSUMPTION":
-            headers, headers_left = split_df(headers_left)
-            metering_id = set(headers.iloc[0, :])
-            assert len(metering_id) == 1
-            metering_id = metering_id.pop()
+def split_by_metering_point(df):
+    available_metering_points = collections.OrderedDict(
+        (x[0], (None, pd.DataFrame())) for x in df.columns.values.tolist()
+    )
+    for (metering_point_id, energy_direction, _type_label), column in df.items():
+        key = metering_point_id
+        existing_direction, df = available_metering_points[key]
 
-            assert set(headers.iloc[1, :]) == {"CONSUMPTION"}
+        if existing_direction:
+            assert energy_direction == existing_direction
 
-            df, df_left = split_df(df_left)
-            df.columns = [
-                "total_consumption",
-                "internal_available",
-                "internal_consumption",
-            ]
+        # strip metering_point_id and energy direction from column.name
+        column.name = column.name[-1]
 
-            yield metering_id, df
-        elif next_data_type in ["GENERATION", ""]:
-            # ignore generation columns for now
-            headers_left = headers_left.iloc[:, 1:]
+        available_metering_points[key] = (
+            energy_direction,
+            pd.concat([df, column], axis=1),
+        )
+
+    return available_metering_points

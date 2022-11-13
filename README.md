@@ -1,7 +1,7 @@
 ## RUNNING THE TOOL
 
     $ pip install -e .
-    $ eda_invoices_cli calc samples/costumers.yaml  samples/musterenergiedatenexcel.xlsx\ -\ ConsumptionDataReport.csv
+    $ eda_invoices_cli calc samples/costumers.yaml ./output/ samples/musterenergiedatenexcel.xlsx\ -\ ConsumptionDataReport.csv
 
 
 ## FOR DEVELOPERS: GETTING STARTED
@@ -27,7 +27,7 @@
     # run tests
     $ poetry run pytest
 
-    $ eda_invoices_cli calc samples/costumers.yaml  samples/musterenergiedatenexcel.xlsx\ -\ ConsumptionDataReport.csv
+    $ eda_invoices_cli calc samples/costumers.yaml ./output/ samples/musterenergiedatenexcel.xlsx\ -\ ConsumptionDataReport.csv
 
 
 ### BUILDING WHEELS AND PACKAGES
