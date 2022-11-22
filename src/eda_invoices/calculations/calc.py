@@ -103,6 +103,8 @@ def split_by_metering_point(df):
         (x[0], (None, pd.DataFrame())) for x in df.columns.values.tolist()
     )
     for (metering_point_id, energy_direction, _type_label), column in df.items():
+        if not metering_point_id:
+            continue
         key = metering_point_id
         existing_direction, df = available_metering_points[key]
 

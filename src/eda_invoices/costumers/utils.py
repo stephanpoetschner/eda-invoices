@@ -3,9 +3,8 @@ import yaml
 from eda_invoices.costumers import data
 
 
-def read_config(filename):
-    with open(filename) as f:
-        configuration = yaml.safe_load(f)
+def read_config(f):
+    configuration = yaml.safe_load(f)
 
     return {
         "bcc": configuration.get("bcc", None),

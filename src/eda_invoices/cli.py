@@ -30,7 +30,8 @@ def calc_metering_data(yaml_conf, dst, eda_export):
 
     dst = pathlib.Path(dst)
 
-    config = read_config(yaml_conf)
+    with open(yaml_conf) as f:
+        config = read_config(f)
     df = calc.parse_raw_data(eda_export)
 
     starts_at: datetime.date = (df.index[0]).date()
@@ -39,8 +40,8 @@ def calc_metering_data(yaml_conf, dst, eda_export):
     prices_consumption = pd.DataFrame(
         {("", "CONSUMPTION", "prices"): [10, 50]},
         index=[
-            pd.Timestamp("2020-01-01 13:30:00"),
-            pd.Timestamp("2025-01-01 13:30:00"),
+            pd.Timestamp("2021-01-01 00:00:00"),
+            pd.Timestamp("2021-03-01 00:00:00"),
         ],
     )
 
@@ -53,7 +54,7 @@ def calc_metering_data(yaml_conf, dst, eda_export):
     df.index = pd.to_datetime(df.index)
     df = df.sort_index()
 
-    df = df["2021-01-01":"2021-01-31"]
+    # df = df["2021-03-01":"2021-03-31"]
 
     df = calc.add_prices(df, prices_consumption)
     df = calc.add_prices(df, prices_generation)
@@ -86,7 +87,11 @@ def calc_metering_data(yaml_conf, dst, eda_export):
             )
             # data = calc.group_by_month(data)
             # data = calc.group_by_day(data)
-            data["local_prices"] = data["local_consumption"] / data["local_costs"]
+            # import ipdb; ipdb.set_trace()
+            data["local_prices"] = (
+                data["local_consumption"] / data["local_costs"]
+            ).fillna(0)
+            # data = data["2021-03-01":"2021-03-31"]
 
             metering_data.append((point, energy_direction, data))
 
