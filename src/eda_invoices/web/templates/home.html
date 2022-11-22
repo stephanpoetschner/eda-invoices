@@ -46,25 +46,25 @@
 
     <section>
       <h1>Abrechnung - Strom</h1>
-      {% for point, data in metering_data %}
+      {% for point, direction, data in metering_data %}
         Anlagenadresse: {{ point.name }}<br>
         Abrechnungszeitraum: {{ starts_at|date:"SHORT_DATE_FORMAT" }} - {{ stops_at|date:"SHORT_DATE_FORMAT" }}<br>
         Stromverbrauch aus EEG: {{ data.local_consumption.sum|floatformat:2 }} kWh
         <small>(Stromverbrauch Gesamt: {{ data.total_consumption.sum|floatformat:2 }} kWh)</small>
 
-        {% if data.price %} {# TODO #}
-        Energiekosten: {{ data.price|floatformat:2 }}
+        {% if "local_prices" in data.columns %} {# TODO #}
+        Energiekosten: {{ data.local_prices.sum|floatformat:2 }} Euro
         {% endif %}
         {% if not forloop.last %}<hr>{% endif %}
       {% endfor %}
 
       {% if total_pricing_data %}
         <br><br>
-        Ihre Gesamtkosten: {{ total_pricing_data }}
+        Ihre Gesamtkosten: {{ total_pricing_data }} Euro
       {% endif %}
     </section>
 
-    {% for point, data in metering_data %}
+    {% for point, direction, data in metering_data %}
       <section>
         <h2>Detailaufstellung zu Rechnung Nr. 1234567890123</h2>
         <ul>
@@ -73,8 +73,32 @@
           <li>Zählpunkt: {{ point.point_id }}</li>
         </ul>
 
-        <table>
-          <tr><td></td></tr>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Datum</th>
+              <th>local_availability</th>
+              <th>local_consumption</th>
+              <th>local_generation</th>
+              <th>local_costs</th>
+              <th>local_income</th>
+              <th>local_prices</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for index, row in data.iterrows %}
+            <tr>
+              <td>{{ index|date:"SHORT_DATETIME_FORMAT" }}</td>
+              <td>{{ row.local_availability|floatformat:2 }}</td>
+              <td>{{ row.local_consumption|floatformat:2 }}</td>
+              <td>{{ row.local_generation|floatformat:2 }}</td>
+              <td>{{ row.local_costs|floatformat:2 }}</td>
+              <td>{{ row.local_income|floatformat:2 }}</td>
+              <td>{{ row.local_prices|floatformat:2 }}</td>
+
+            </tr>
+            {% endfor %}
+          </tbody>
         </table>
       </section>
     {% endfor %}

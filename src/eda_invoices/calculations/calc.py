@@ -1,4 +1,5 @@
 import collections
+import datetime
 
 import pandas as pd
 
@@ -32,8 +33,9 @@ def to_df(data, header_row_count=3):
             "total_consumption",
             "Gesamtverbrauch lt. Messung (bei Teilnahme gem. Erzeugung) [KWH]",
         ),
-        ("local_availability", "Eigendeckung gemeinschaftliche Erzeugung [KWH]"),
-        ("local_consumption", "Anteil gemeinschaftliche Erzeugung [KWH]"),
+        ("local_availability", "Anteil gemeinschaftliche Erzeugung [KWH]"),
+        ("local_consumption", "Eigendeckung gemeinschaftliche Erzeugung [KWH]"),
+        ("local_generation", "Gesamte gemeinschaftliche Erzeugung [KWH]"),
     ):
         df.loc["Metercode"] = df.loc["Metercode"].replace(description, label)
 
@@ -61,12 +63,18 @@ def to_df(data, header_row_count=3):
 
 
 def group_by_month(df):
-    df = df.groupby(by=[df.index.month, df.index.year]).sum()
+    df = df.groupby(
+        by=lambda x: datetime.datetime(year=x.year, month=x.month, day=1)
+    ).sum()
+    return df
+
+
+def group_by_day(df):
+    df = df.groupby(by=lambda x: x.date()).sum()
     return df
 
 
 def add_prices(df, prices):
-    df = df.sort_index()
     df = pd.merge_asof(
         df, prices, left_index=True, right_index=True, direction="backward"
     )
