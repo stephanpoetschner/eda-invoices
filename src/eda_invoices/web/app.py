@@ -1,3 +1,4 @@
+import datetime
 import pathlib
 import sys
 
@@ -64,13 +65,31 @@ def setup():
 
 
 # views
-def home(request):
-    return render(request, "home.html")
+def render_invoice(request, metering_point_id):
+    from eda_invoices.calculations import calc
+    from eda_invoices.calculations.config import reader as config_reader
+
+    yaml_conf = "samples/costumers.yaml"
+    eda_export = "samples/musterenergiedatenexcel.xlsx - ConsumptionDataReport.csv"
+
+    with open(yaml_conf) as f:
+        config = config_reader.parse_config(f)
+    df = calc.parse_raw_data(eda_export)
+
+    for template_path, ctx in calc.prepare_invoices(
+        config, df, invoice_date=datetime.date.today(), invoice_number="1234567890123"
+    ):
+        metering_point_ids = [
+            metering_point_id
+            for (metering_point_id, energy_direction, data) in ctx["metering_data"]
+        ]
+        if metering_point_id in metering_point_ids:
+            return render(request, template_path, ctx)
 
 
 # urls
 urlpatterns = [
-    path("", home, name="home"),
+    path("<str:metering_point_id>", render_invoice, name="render_invoice"),
 ]
 
 # run the app

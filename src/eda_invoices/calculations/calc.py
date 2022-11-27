@@ -120,3 +120,85 @@ def split_by_metering_point(df):
         )
 
     return available_metering_points
+
+
+def transform(df, config):
+    prices_consumption = pd.DataFrame(
+        {("", "CONSUMPTION", "prices"): [10, 50]},
+        index=[
+            pd.Timestamp("2021-01-01 00:00:00"),
+            pd.Timestamp("2021-03-01 00:00:00"),
+        ],
+    )
+
+    prices_generation = pd.DataFrame(
+        {("", "GENERATION", "prices"): [40]},
+        index=[
+            pd.Timestamp("2020-01-01 13:30:00"),
+        ],
+    )
+    df.index = pd.to_datetime(df.index)
+    df = df.sort_index()
+
+    # df = df["2021-03-01":"2021-03-31"]
+
+    df = add_prices(df, prices_consumption)
+    df = add_prices(df, prices_generation)
+
+    for (metering_point_id, energy_direction, type_label), _data in df.items():
+        if energy_direction == "CONSUMPTION" and type_label == "local_consumption":
+            df[metering_point_id, energy_direction, "local_costs"] = (
+                df[metering_point_id, energy_direction, "local_consumption"]
+                * df["", energy_direction, "prices"]
+            )
+        elif energy_direction == "GENERATION" and type_label == "local_generation":
+            df[metering_point_id, energy_direction, "local_income"] = (
+                df[metering_point_id, energy_direction, "local_generation"]
+                * df["", energy_direction, "prices"]
+            )
+
+    # df = df.drop(("", "CONSUMPTION", "prices"), axis=1)
+    # df = df.drop(("", "GENERATION", "prices"), axis=1)
+
+    all_metering_data = split_by_metering_point(df)
+    for customer in config["customers"]:
+        metering_data = []
+        for point in customer.metering_points:
+            energy_direction, data = all_metering_data.get(
+                point.point_id, (None, pd.DataFrame())
+            )
+            # data = group_by_month(data)
+            data = group_by_day(data)
+            # import ipdb; ipdb.set_trace()
+            data["local_prices"] = (
+                data["local_consumption"] / data["local_costs"]
+            ).fillna(0)
+            # data = data["2021-03-01":"2021-03-31"]
+
+            metering_data.append((point, energy_direction, data))
+
+        print(customer)
+        print(metering_data)
+        yield customer, metering_data
+
+
+def calc_totals(metering_data):
+    # TODO: calculate total pricing data
+    return None
+
+
+def prepare_invoices(config, df, **extra_kwargs):
+    starts_at: datetime.date = (df.index[0]).date()
+    stops_at: datetime.date = (df.index[-1]).date()
+
+    for customer, metering_data in transform(df, config):
+        total_pricing_data = calc_totals(metering_data)
+
+        yield "invoice.html", {
+            "sender": config["sender"],
+            "customer": customer,
+            "starts_at": starts_at,
+            "stops_at": stops_at,
+            "metering_data": metering_data,
+            "total_pricing_data": total_pricing_data,
+        } | extra_kwargs

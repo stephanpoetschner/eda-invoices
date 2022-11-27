@@ -1,9 +1,9 @@
 import yaml
 
-from eda_invoices.costumers import data
+from eda_invoices.calculations.config import data
 
 
-def read_config(f):
+def parse_config(f):
     configuration = yaml.safe_load(f)
 
     return {
