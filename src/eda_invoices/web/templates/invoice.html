@@ -88,7 +88,7 @@
           <tbody>
             {% for index, row in data.iterrows %}
             <tr>
-              <td>{{ index }}</td>{# |date:"SHORT_DATETIME_FORMAT" #}
+              <td>{{ index|date:"SHORT_DATE_FORMAT" }}</td>{#  #}
               <td>{{ row.local_availability|floatformat:3 }}</td>
               <td>{{ row.local_consumption|floatformat:3 }}</td>
               <td>{{ row.local_generation|floatformat:3 }}</td>

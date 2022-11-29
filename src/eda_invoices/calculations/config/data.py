@@ -4,6 +4,8 @@ from typing import Optional
 
 from pydantic.dataclasses import dataclass
 
+from eda_invoices.calculations.config.enums import EnergyDirection
+
 
 @dataclass
 class Address:
@@ -24,6 +26,8 @@ class Address:
 class MeteringPoint:
     point_id: str
     name: str
+    direction: Optional[EnergyDirection] = None
+    # data: Optional[pd.DataFrame] = None
 
 
 @dataclass

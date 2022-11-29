@@ -66,11 +66,15 @@ def group_by_month(df):
     df = df.groupby(
         by=lambda x: datetime.datetime(year=x.year, month=x.month, day=1)
     ).sum()
+    df.index = pd.to_datetime(df.index)
+    df = df.sort_index()
     return df
 
 
 def group_by_day(df):
     df = df.groupby(by=lambda x: x.date()).sum()
+    df.index = pd.to_datetime(df.index)
+    df = df.sort_index()
     return df
 
 
