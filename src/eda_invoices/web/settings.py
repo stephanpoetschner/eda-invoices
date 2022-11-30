@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     # "django.contrib.messages",
     "django.contrib.staticfiles",
     "eda_invoices.invoices",
+    "eda_invoices.web",
 ]
 
 MIDDLEWARE = [

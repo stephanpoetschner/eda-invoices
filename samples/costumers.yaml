@@ -1,15 +1,15 @@
 bcc:
-  - invoice@verbund.at
+  - invoice@eda.at
 sender:
-  name: VERBUND AG.
-  vat_id: ATU14703908
+  name: EDA Energiewirtschaftlicher Datenaustausch GmbH
+  vat_id: ATU 76159737
   address:
-    line: Postfach 8400
-    post_code: 1011
+    line: Am Belvedere 8
+    post_code: 1100 Wien
     city: Wien
-  email: service@verbund.at
-  web: https://www.verbund.at/
-  phone: Mo-Fr 7-18 Uhr  0800 210 210
+  email: service@eda.at
+  web: https://www.eda.at/
+  phone: Mo-Fr 7-18 Uhr  +43 1 3618 313-0
 customers:
 - email: max.mustermann@example.com
   name: Max Mustermann

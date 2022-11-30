@@ -1,4 +1,4 @@
-<!doctype html>
+{% load invoice_extras %}<!doctype html>
 <html lang="de">
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -22,6 +22,7 @@
       .senderAddress { font-size: .75rem; }
       .invoiceHead { margin: 1rem 0;}
       .meteringDataOverview { margin-top: 2rem; }
+      .invoiceDetails-header { margin: 1rem 0 2rem; }
     </style>
   </head>
 
@@ -31,7 +32,7 @@
                       row justify-content-md-center">
         <div class="senderAddress invoiceHead
                     col-lg-4">
-          {{ sender.name }}
+          {{ sender.name }}<br/>
           {{ sender.address.short }}
         </div>
         <div class="col-lg">&nbsp;</div>
@@ -65,7 +66,7 @@
 
     <div class="container">
       <section class="mainSection">
-        <h1>Abrechnung - Strom</h1>
+        <h1>Abrechnung - EEG Strom</h1>
         {% for point, direction, data in metering_data %}
         <ul class="list-unstyled list-spaced
                    meteringDataOverview">
@@ -86,7 +87,7 @@
             <li class="text-light bg-dark">
               <strong>
                 Energiekosten:
-                <span class="val">{{ data.local_prices_agg.sum|floatformat:2 }} Euro</span></strong>
+                <span class="val">{{ data.local_costs.sum|floatformat:2 }} Euro</span></strong>
             </li>
           {% endif %}
         </ul>
@@ -102,20 +103,34 @@
       {% for point, direction, data in metering_data %}
         <section class="mainSection">
           <h2>Detailaufstellung zu Rechnung Nr. {{ invoice_number }}</h2>
-          <ul class="list-unstyled">
-            <li>
-              Kundenanlage:
-              <strong class="val">{{ point.name }}</strong>
-            </li>
+          <div class="invoiceDetails-header">
+            <div class="row">
+              <div class="col-md-4 col-lg-2">
+                Kundenanlage:
+              </div>
+              <div class="col">
+                <strong class="val">{{ point.name }}</strong>
+              </div>
+            </div>
             {% if customer.customer_id %}
-            <li>
-              Kund:innen-Nummer: <span class="val">{{ customer.customer_id }}</span>
-            </li>
+              <div class="row">
+                <div class="col-md-4 col-lg-2">
+                  Kund:innen-Nummer:
+                </div>
+                <div class="col">
+                  <span class="val">{{ customer.customer_id }}</span>
+                </div>
+              </div>
             {% endif %}
-            <li>
-              Zählpunkt: <span class="val">{{ point.point_id }}</span>
-            </li>
-          </ul>
+            <div class="row">
+                <div class="col-md-4 col-lg-2">
+                  Zählpunkt:
+                </div>
+                <div class="col">
+                  <span class="val">{{ point.point_id }}</span>
+                </div>
+              </div>
+          </div>
 
           <table class="table table-bordered table-sm">
             <thead>
@@ -139,7 +154,7 @@
             <tbody>
               {% for index, row in data.iterrows %}
               <tr>
-                <th scope="row">{{ index|date:"SHORT_DATE_FORMAT" }}</th>{#  #}
+                <th scope="row">{{ index|date:"SHORT_DATE_FORMAT" }} - {{ index|end_of_month|date:"SHORT_DATE_FORMAT" }}</th>{#  #}
                 <td class="align-r">
                   <span title="local_consumption">{{ row.local_consumption|floatformat:3 }}</span>
                   <small title="local_availability">/ {{ row.local_availability|floatformat:3 }}</small>
@@ -155,6 +170,21 @@
 
               </tr>
               {% endfor %}
+              <tr class="text-light bg-dark">
+                <th scope="row">Gesamt</th>
+                <th scope="col" class="align-r">
+                  <span title="local_consumption">{{ data.local_consumption.sum|floatformat:3 }}</span>
+                  <small title="local_availability">/ {{ data.local_availability.sum|floatformat:3 }}</small>
+                </th>
+                <th scope="col" class="text-justify">kWh</th>
+                <th scope="col" title="local_prices_agg"
+                    class="text-right">
+                  {{ data.local_prices_agg|floatformat:3 }}
+                </th>
+                <th scope="col" class="text-right">
+                  {{ data.local_costs.sum|floatformat:2 }}
+                </th>
+              </tr>
             </tbody>
           </table>
         </section>
