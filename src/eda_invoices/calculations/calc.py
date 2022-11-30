@@ -128,7 +128,7 @@ def split_by_metering_point(df):
 
 def transform(df, config):
     prices_consumption = pd.DataFrame(
-        {("", "CONSUMPTION", "prices"): [10, 50]},
+        {("", "CONSUMPTION", "prices"): [0.30, 0.50]},
         index=[
             pd.Timestamp("2021-01-01 00:00:00"),
             pd.Timestamp("2021-03-01 00:00:00"),
@@ -171,11 +171,11 @@ def transform(df, config):
             energy_direction, data = all_metering_data.get(
                 point.point_id, (None, pd.DataFrame())
             )
-            # data = group_by_month(data)
-            data = group_by_day(data)
+            data = group_by_month(data)
+            # data = group_by_day(data)
             # import ipdb; ipdb.set_trace()
-            data["local_prices"] = (
-                data["local_consumption"] / data["local_costs"]
+            data["local_prices_agg"] = (
+                data["local_costs"] / data["local_consumption"]
             ).fillna(0)
             # data = data["2021-03-01":"2021-03-31"]
 

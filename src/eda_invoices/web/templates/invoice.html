@@ -1,107 +1,166 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
   <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>Starter Template for Bootstrap</title>
+    <title>EDA Invoices</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="https://getbootstrap.com/docs/4.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+          crossorigin="anonymous">
+    <style>
+      .mainSection { margin-top: 2rem; margin-bottom: 4rem; }
 
-    <!-- Custom styles for this template -->
-    <link href="starter-template.css" rel="stylesheet">
+      .list-spaced > li {
+        padding: 0.25rem 0.5rem;
+        margin: 0.25rem -0.5rem 0;
+      }
+
+      .val { padding-left: .5em;}
+
+      .senderAddress { font-size: .75rem; }
+      .invoiceHead { margin: 1rem 0;}
+      .meteringDataOverview { margin-top: 2rem; }
+    </style>
   </head>
 
   <body>
-    <div>
-      {{ sender.name }} {{ sender.address.short }}
-    </div>
-
-    <div>
-      {{ customer.name }}<br>
-      {{ customer.address.line }}<br>
-      {{ customer.address.post_city }}
-    </div>
-
-    <div>
-      So erreichen Sie uns<br>
-      <br>
-      <ul>
-        <li>E-Mail: {{ sender.email }}</li>
-        <li>Tel: {{ sender.phone }}</li>
-      </ul>
-    </div>
-
-    <div>
-      <strong>Ihre Rechnungsdaten</strong>
-      <ul>
-        {% if customer.customer_id %}<li>Kund:innen-Nummer: {{ customer.customer_id }}</li>{% endif %}
-        {% if invoice_number %}<li>Rechnungsnummer: {{ invoice_number }}</li> {% endif %}
-        <li>Rechnungsdatum: {{ invoice_date|date:"SHORT_DATE_FORMAT"}}</li>
-      </ul>
-    </div>
-
-    <section>
-      <h1>Abrechnung - Strom</h1>
-      {% for point, direction, data in metering_data %}
-        Anlagenadresse: {{ point.name }}<br>
-        Abrechnungszeitraum: {{ starts_at|date:"SHORT_DATE_FORMAT" }} - {{ stops_at|date:"SHORT_DATE_FORMAT" }}<br>
-        Stromverbrauch aus EEG: {{ data.local_consumption.sum|floatformat:2 }} kWh
-        <small>(Stromverbrauch Gesamt: {{ data.total_consumption.sum|floatformat:2 }} kWh)</small>
-
-        {% if "local_prices" in data.columns %} {# TODO #}
-        Energiekosten: {{ data.local_prices.sum|floatformat:2 }} Euro
-        {% endif %}
-        {% if not forloop.last %}<hr>{% endif %}
-      {% endfor %}
-
-      {% if total_pricing_data %}
-        <br><br>
-        Ihre Gesamtkosten: {{ total_pricing_data }} Euro
-      {% endif %}
-    </section>
-
-    {% for point, direction, data in metering_data %}
-      <section>
-        <h2>Detailaufstellung zu Rechnung Nr. 1234567890123</h2>
-        <ul>
-          <li>Kundenanlage: {{ point.name }}</li>
-          {% if customer.customer_id %}<li>Kund:innen-Nummer: {{ customer.customer_id }}</li>{% endif %}
-          <li>Zählpunkt: {{ point.point_id }}</li>
-        </ul>
-
-        <table class="table">
-          <thead>
-            <tr>
-              <th>Datum</th>
-              <th>local_availability</th>
-              <th>local_consumption</th>
-              <th>local_generation</th>
-              <th>local_costs</th>
-              <th>local_income</th>
-              <th>local_prices</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for index, row in data.iterrows %}
-            <tr>
-              <td>{{ index|date:"SHORT_DATE_FORMAT" }}</td>{#  #}
-              <td>{{ row.local_availability|floatformat:3 }}</td>
-              <td>{{ row.local_consumption|floatformat:3 }}</td>
-              <td>{{ row.local_generation|floatformat:3 }}</td>
-              <td>{{ row.local_costs|floatformat:2 }}</td>
-              <td>{{ row.local_income|floatformat:2 }}</td>
-              <td>{{ row.local_prices|floatformat:2 }}</td>
-
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+    <div class="container">
+      <section class="senderSection
+                      row justify-content-md-center">
+        <div class="senderAddress invoiceHead
+                    col-lg-4">
+          {{ sender.name }}
+          {{ sender.address.short }}
+        </div>
+        <div class="col-lg">&nbsp;</div>
+        <div class="col-lg-4 invoiceHead">
+          <strong>So erreichen Sie uns</strong><br>
+          <ul class="list-unstyled list-spaced">
+            <li class="text-light bg-dark"><strong>E-Mail: <span class="val">{{ sender.email }}</span></strong></li>
+            <li>Tel: {{ sender.phone }}</li>
+          </ul>
+        </div>
       </section>
-    {% endfor %}
+
+      <section id="customerSection" class="row justify-content-md-center">
+        <div class="col-lg-4 invoiceHead">
+          {{ customer.name }}<br>
+          {{ customer.address.line }}<br>
+          {{ customer.address.post_city }}
+        </div>
+        <div class="col-lg">&nbsp;</div>
+        <div class="col-lg-4 invoiceHead">
+          <strong>Ihre Rechnungsdaten</strong>
+          <ul class="list-unstyled
+                     invoiceHead">
+            {% if customer.customer_id %}<li>Kund:innen-Nummer: <span class="val">{{ customer.customer_id }}</span></li>{% endif %}
+            {% if invoice_number %}<li>Rechnungsnummer: <span class="val">{{ invoice_number }}</span></li> {% endif %}
+            <li>Rechnungsdatum: <span class="val">{{ invoice_date|date:"SHORT_DATE_FORMAT"}}</span></li>
+          </ul>
+        </div>
+      </section>
+    </div>
+
+    <div class="container">
+      <section class="mainSection">
+        <h1>Abrechnung - Strom</h1>
+        {% for point, direction, data in metering_data %}
+        <ul class="list-unstyled list-spaced
+                   meteringDataOverview">
+          <li>
+            Anlagenadresse:
+            <span class="val">{{ point.name }}</span></li>
+          <li>
+            Abrechnungszeitraum:
+            <span class="val">{{ starts_at|date:"SHORT_DATE_FORMAT" }} - {{ stops_at|date:"SHORT_DATE_FORMAT" }}</span></li>
+          <li>
+            Stromverbrauch aus EEG:
+            <span class="val">{{ data.local_consumption.sum|floatformat:2 }} kWh</span>
+
+            <small>/ Stromverbrauch Gesamt:
+              <span class="val">{{ data.total_consumption.sum|floatformat:2 }} kWh</span></small></li>
+
+          {% if "local_prices_agg" in data.columns %} {# TODO #}
+            <li class="text-light bg-dark">
+              <strong>
+                Energiekosten:
+                <span class="val">{{ data.local_prices_agg.sum|floatformat:2 }} Euro</span></strong>
+            </li>
+          {% endif %}
+        </ul>
+        {% if not forloop.last %}<hr>{% endif %}
+        {% endfor %}
+
+        {% if total_pricing_data %}
+          <br><br>
+          Ihre Gesamtkosten: {{ total_pricing_data }} Euro
+        {% endif %}
+      </section>
+
+      {% for point, direction, data in metering_data %}
+        <section class="mainSection">
+          <h2>Detailaufstellung zu Rechnung Nr. {{ invoice_number }}</h2>
+          <ul class="list-unstyled">
+            <li>
+              Kundenanlage:
+              <strong class="val">{{ point.name }}</strong>
+            </li>
+            {% if customer.customer_id %}
+            <li>
+              Kund:innen-Nummer: <span class="val">{{ customer.customer_id }}</span>
+            </li>
+            {% endif %}
+            <li>
+              Zählpunkt: <span class="val">{{ point.point_id }}</span>
+            </li>
+          </ul>
+
+          <table class="table table-bordered table-sm">
+            <thead>
+              <tr>
+                <th scope="col">Zeitraum</th>
+                <th scope="col" class="align-r">
+                  <span title="local_consumption">Verbrauch</span>
+                  <small title="local_availability">/ Verfügbar</small>
+                </th>
+                <th scope="col" class="text-justify">Einheit</th>
+                <th scope="col"
+                    class="text-right">
+                  <span title="local_prices_agg">
+                    Einzelpreis in €</span>
+                </th>
+                <th scope="col"
+                    class="text-right">
+                  Betrag in €</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for index, row in data.iterrows %}
+              <tr>
+                <th scope="row">{{ index|date:"SHORT_DATE_FORMAT" }}</th>{#  #}
+                <td class="align-r">
+                  <span title="local_consumption">{{ row.local_consumption|floatformat:3 }}</span>
+                  <small title="local_availability">/ {{ row.local_availability|floatformat:3 }}</small>
+                </td>
+                <td class="text-justify">kWh</td>
+                <td title="local_prices_agg"
+                    class="text-right">
+                  {{ row.local_prices_agg|floatformat:3 }}
+                </td>
+                <td class="text-right">
+                  {{ row.local_costs|floatformat:2 }}
+                </td>
+
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </section>
+      {% endfor %}
+    </div>
+
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
