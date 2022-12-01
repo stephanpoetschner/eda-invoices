@@ -1,10 +1,10 @@
+import datetime
 from dataclasses import field
 from typing import List
 from typing import Optional
+from typing import Union
 
 from pydantic.dataclasses import dataclass
-
-from eda_invoices.calculations.config.enums import EnergyDirection
 
 
 @dataclass
@@ -26,8 +26,7 @@ class Address:
 class MeteringPoint:
     point_id: str
     name: str
-    direction: Optional[EnergyDirection] = None
-    # data: Optional[pd.DataFrame] = None
+    active_tariff: Optional[str] = None
 
 
 @dataclass
@@ -37,6 +36,18 @@ class Customer:
     customer_id: str
     address: Address
     metering_points: Optional[List[MeteringPoint]] = field(default_factory=lambda: [])
+
+
+@dataclass
+class TariffPricepoint:
+    price: float
+    date: Union[datetime.datetime, datetime.date]
+
+
+@dataclass
+class Tariff:
+    name: str
+    prices: List[TariffPricepoint] = field(default_factory=lambda: [])
 
 
 @dataclass

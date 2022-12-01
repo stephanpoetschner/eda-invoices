@@ -21,10 +21,10 @@ def render_invoice(request, customer_id="12345678"):
 
     with open(yaml_conf) as f:
         config = config_reader.parse_config(f)
-    df = calc.parse_raw_data(eda_export)
+    data = calc.clean_data(eda_export)
 
     for template_path, ctx in calc.prepare_invoices(
-        config, df, invoice_date=datetime.date.today(), invoice_number="1234567890123"
+        config, data, invoice_date=datetime.date.today(), invoice_number="1234567890123"
     ):
         if customer_id == ctx["customer"].customer_id:
             return render(request, template_path, ctx)

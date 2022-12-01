@@ -22,15 +22,19 @@ customers:
   metering_points:
     - point_id: AT9990000991100000000000209351633
       name: Max Mustermann, Beispielstraße 24, 1010 Wien
+      active_tariff: default_consumption
     - point_id: AT9990000991100000000000209351644
       name: Max Mustermann, Beispielstraße 1, 8010 Graz
+      active_tariff: default_consumption
+    - point_id: AT9990000991100000000099000003411
+      name: Leopoldstadt, 1020 Wien
+      active_tariff: default_generation
 tariffs:
   - name: default_consumption
     prices:
-      - price: 15.0
-        date: 2022-11-02
+      - price: 0.15
+        date: 2022-01-02
   - name: default_generation
-    direction: generation
     prices:
-      - price: 14.0
-        date: 2022-11-02
+      - price: 0.14
+        date: 2020-01-02T00:00:00
