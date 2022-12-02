@@ -1,5 +1,6 @@
 bcc:
   - invoice@eda.at
+
 sender:
   name: EDA Energiewirtschaftlicher Datenaustausch GmbH
   vat_id: ATU 76159737
@@ -10,18 +11,18 @@ sender:
   email: service@eda.at
   web: https://www.eda.at/
   phone: Mo-Fr 7-18 Uhr  +43 1 3618 313-0
+
 customers:
 - email: max.mustermann@example.com
   name: Max Mustermann
   customer_id: 12345678
-  tariffs: default_consumption
   address:
     line: Beispielstraße 24
     post_code: 1010
     city: Wien
   metering_points:
     - point_id: AT9990000991100000000099000003411
-      name: Leopoldstadt, 1020 Wien
+      name: PV 70kWp, Leopoldstadt, 1020 Wien
       active_tariff: default_generation
     - point_id: AT9990000991100000000000209351633
       name: Max Mustermann, Beispielstraße 24, 1010 Wien
@@ -29,6 +30,18 @@ customers:
     - point_id: AT9990000991100000000000209351644
       name: Max Mustermann, Beispielstraße 1, 8010 Graz
       active_tariff: default_consumption
+- email: johanna.musterfrau@example.com
+  name: Johanna Musterfrau
+  customer_id: 12345677
+  default_tariff: default_consumption
+  address:
+    line: Unternehmensstraße 24
+    post_code: 1010
+    city: Wien
+  metering_points:
+    - point_id: AT9990000991100000000099000003411
+      name: PV 70kWp, Leopoldstadt, 1020 Wien
+
 tariffs:
   - name: default_consumption
     prices:

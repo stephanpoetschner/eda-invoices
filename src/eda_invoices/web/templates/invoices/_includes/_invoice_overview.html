@@ -1,0 +1,55 @@
+<section class="mainSection">
+  <h1>Abrechnung - EEG Strom</h1>
+  <ul class="list-unstyled list-spaced
+             meteringDataOverview">
+    <li>
+      Abrechnungszeitraum:
+      <span class="val">{{ starts_at|date:"SHORT_DATE_FORMAT" }} - {{ stops_at|date:"SHORT_DATE_FORMAT" }}</span></li>
+  </ul>
+
+  {% for point, energy_direction, data in metering_data %}
+  <ul class="list-unstyled list-spaced
+             meteringDataOverview">
+    <li>
+      Anlagenadresse:
+      <span class="val">{{ point.name }}</span></li>
+    {% if energy_direction == 'CONSUMPTION' %}
+      <li>
+        Stromverbrauch:
+        <span class="val">{{ data.local_quantity.sum|floatformat:2 }} kWh</span>
+
+        {% if data.total_consumption.sum %}
+        <small>/ Stromverbrauch Gesamt:
+          <span class="val">{{ data.total_consumption.sum|floatformat:2 }} kWh</span></small>
+        {% endif %}
+      </li>
+
+      {% if "local_prices_agg" in data.columns %}
+        <li class="text-light bg-dark">
+          <strong>
+            Energiekosten:
+            <span class="val">{{ data.local_costs.sum|floatformat:2 }} Euro</span></strong>
+        </li>
+      {% endif %}
+    {% else %}
+      <li>
+        Stromerzeugung:
+        <span class="val">{{ data.local_quantity.sum|floatformat:2 }} kWh</span>
+      </li>
+      {% if "local_prices_agg" in data.columns %}
+        <li class="text-light bg-dark">
+          <strong>
+            Gewinn durch Energieproduktion:
+            <span class="val">{{ data.local_costs.sum|floatformat:2 }} Euro</span></strong>
+        </li>
+      {% endif %}
+    {% endif %}
+  </ul>
+  {% if not forloop.last %}<hr>{% endif %}
+  {% endfor %}
+
+  {% if total_pricing_data %}
+    <br><br>
+    Ihre Gesamtkosten: {{ total_pricing_data }} Euro
+  {% endif %}
+</section>

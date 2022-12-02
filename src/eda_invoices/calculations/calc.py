@@ -130,7 +130,10 @@ def transform(df, config, prices):
                 point.point_id, (None, pd.DataFrame())
             )
 
-            active_tariff = prices[point.active_tariff]
+            active_tariff = pd.DataFrame(index=pd.to_datetime([]))
+            selected_tariff = point.active_tariff or customer.default_tariff
+            if selected_tariff in prices:
+                active_tariff = prices[selected_tariff]
             data = pd.merge_asof(
                 data,
                 active_tariff,
@@ -183,7 +186,7 @@ def prepare_invoices(config, data, **extra_kwargs):
     for customer, metering_data in transform(df, config, prices):
         total_pricing_data = calc_totals(metering_data)
 
-        yield "invoice.html", {
+        yield "invoices/invoice.html", {
             "sender": config["sender"],
             "customer": customer,
             "starts_at": starts_at,

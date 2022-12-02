@@ -1,0 +1,36 @@
+<div class="container">
+  <section class="senderSection
+                  row justify-content-md-center">
+    <div class="senderAddress invoiceHead
+                col-lg-4">
+      {{ sender.name }}<br/>
+      {{ sender.address.short }}
+    </div>
+    <div class="col-lg">&nbsp;</div>
+    <div class="col-lg-4 invoiceHead">
+      <strong>So erreichen Sie uns</strong><br>
+      <ul class="list-unstyled list-spaced">
+        <li class="text-light bg-dark"><strong>E-Mail: <span class="val">{{ sender.email }}</span></strong></li>
+        <li>Tel: {{ sender.phone }}</li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="customerSection" class="row justify-content-md-center">
+    <div class="col-lg-4 invoiceHead">
+      {{ customer.name }}<br>
+      {{ customer.address.line }}<br>
+      {{ customer.address.post_city }}
+    </div>
+    <div class="col-lg">&nbsp;</div>
+    <div class="col-lg-4 invoiceHead">
+      <strong>Ihre Rechnungsdaten</strong>
+      <ul class="list-unstyled
+                 invoiceHead">
+        {% if customer.customer_id %}<li>Kund:innen-Nummer: <span class="val">{{ customer.customer_id }}</span></li>{% endif %}
+        {% if invoice_number %}<li>Rechnungsnummer: <span class="val">{{ invoice_number }}</span></li> {% endif %}
+        <li>Rechnungsdatum: <span class="val">{{ invoice_date|date:"SHORT_DATE_FORMAT"}}</span></li>
+      </ul>
+    </div>
+  </section>
+</div>

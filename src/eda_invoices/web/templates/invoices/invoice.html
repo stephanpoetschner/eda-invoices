@@ -1,0 +1,11 @@
+{% extends "_base.html" %}
+
+
+{% block body %}
+  {% include "invoices/_includes/_invoice_head.html" %}
+
+  <div class="container">
+    {% include "invoices/_includes/_invoice_overview.html" %}
+    {% include "invoices/_includes/_invoice_details.html" %}
+  </div>
+{% endblock %}

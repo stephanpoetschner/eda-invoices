@@ -35,6 +35,7 @@ class Customer:
     name: str
     customer_id: str
     address: Address
+    default_tariff: Optional[str] = None
     metering_points: Optional[List[MeteringPoint]] = field(default_factory=lambda: [])
 
 

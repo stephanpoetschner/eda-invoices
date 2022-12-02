@@ -1,0 +1,13 @@
+.mainSection { margin-top: 2rem; margin-bottom: 4rem; }
+
+.list-spaced > li {
+padding: 0.25rem 0.5rem;
+margin: 0.25rem -0.5rem 0;
+}
+
+.val { padding-left: .5em;}
+
+.senderAddress { font-size: .75rem; }
+.invoiceHead { margin: 1rem 0;}
+.meteringDataOverview { margin-top: 2rem; }
+.invoiceDetails-header { margin: 1rem 0 2rem; }
