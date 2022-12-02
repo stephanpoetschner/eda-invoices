@@ -34,8 +34,8 @@ def to_df(data, header_row_count=3):
             "Gesamtverbrauch lt. Messung (bei Teilnahme gem. Erzeugung) [KWH]",
         ),
         ("local_availability", "Anteil gemeinschaftliche Erzeugung [KWH]"),
-        ("local_consumption", "Eigendeckung gemeinschaftliche Erzeugung [KWH]"),
-        ("local_generation", "Gesamte gemeinschaftliche Erzeugung [KWH]"),
+        ("local_quantity", "Eigendeckung gemeinschaftliche Erzeugung [KWH]"),
+        ("local_quantity", "Gesamte gemeinschaftliche Erzeugung [KWH]"),
     ):
         df.loc["Metercode"] = df.loc["Metercode"].replace(description, label)
 
@@ -139,21 +139,13 @@ def transform(df, config, prices):
                 direction="backward",
             )
 
-            if energy_direction == "CONSUMPTION":
-                data["local_costs"] = data["local_consumption"] * data["tariff"]
-            elif energy_direction == "GENERATION":
-                data["local_income"] = data["local_generation"] * data["tariff"]
-
+            data["local_costs"] = data["local_quantity"] * data["tariff"]
             data = group_by_month(data)
             # data = group_by_day(data)
-            if energy_direction == "CONSUMPTION":
-                data["local_prices_agg"] = (
-                    data["local_costs"] / data["local_consumption"]
-                ).fillna(0)
-            elif energy_direction == "GENERATION":
-                data["local_prices_agg"] = (
-                    data["local_income"] / data["local_generation"]
-                ).fillna(0)
+
+            data["local_prices_agg"] = (
+                data["local_costs"] / data["local_quantity"]
+            ).fillna(0)
             # data = data["2021-03-01":"2021-03-04"]
 
             metering_data.append((point, energy_direction, data))

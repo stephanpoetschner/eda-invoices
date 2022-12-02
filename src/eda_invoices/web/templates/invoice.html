@@ -67,28 +67,49 @@
     <div class="container">
       <section class="mainSection">
         <h1>Abrechnung - EEG Strom</h1>
-        {% for point, direction, data in metering_data %}
+        <ul class="list-unstyled list-spaced
+                   meteringDataOverview">
+          <li>
+            Abrechnungszeitraum:
+            <span class="val">{{ starts_at|date:"SHORT_DATE_FORMAT" }} - {{ stops_at|date:"SHORT_DATE_FORMAT" }}</span></li>
+        </ul>
+
+        {% for point, energy_direction, data in metering_data %}
         <ul class="list-unstyled list-spaced
                    meteringDataOverview">
           <li>
             Anlagenadresse:
             <span class="val">{{ point.name }}</span></li>
-          <li>
-            Abrechnungszeitraum:
-            <span class="val">{{ starts_at|date:"SHORT_DATE_FORMAT" }} - {{ stops_at|date:"SHORT_DATE_FORMAT" }}</span></li>
-          <li>
-            Stromverbrauch aus EEG:
-            <span class="val">{{ data.local_consumption.sum|floatformat:2 }} kWh</span>
+          {% if energy_direction == 'CONSUMPTION' %}
+            <li>
+              Stromverbrauch:
+              <span class="val">{{ data.local_quantity.sum|floatformat:2 }} kWh</span>
 
-            <small>/ Stromverbrauch Gesamt:
-              <span class="val">{{ data.total_consumption.sum|floatformat:2 }} kWh</span></small></li>
-
-          {% if "local_prices_agg" in data.columns %} {# TODO #}
-            <li class="text-light bg-dark">
-              <strong>
-                Energiekosten:
-                <span class="val">{{ data.local_costs.sum|floatformat:2 }} Euro</span></strong>
+              {% if data.total_consumption.sum %}
+              <small>/ Stromverbrauch Gesamt:
+                <span class="val">{{ data.total_consumption.sum|floatformat:2 }} kWh</span></small>
+              {% endif %}
             </li>
+
+            {% if "local_prices_agg" in data.columns %}
+              <li class="text-light bg-dark">
+                <strong>
+                  Energiekosten:
+                  <span class="val">{{ data.local_costs.sum|floatformat:2 }} Euro</span></strong>
+              </li>
+            {% endif %}
+          {% else %}
+            <li>
+              Stromerzeugung:
+              <span class="val">{{ data.local_quantity.sum|floatformat:2 }} kWh</span>
+            </li>
+            {% if "local_prices_agg" in data.columns %}
+              <li class="text-light bg-dark">
+                <strong>
+                  Gewinn durch Energieproduktion:
+                  <span class="val">{{ data.local_costs.sum|floatformat:2 }} Euro</span></strong>
+              </li>
+            {% endif %}
           {% endif %}
         </ul>
         {% if not forloop.last %}<hr>{% endif %}
@@ -100,7 +121,7 @@
         {% endif %}
       </section>
 
-      {% for point, direction, data in metering_data %}
+      {% for point, energy_direction, data in metering_data %}
         <section class="mainSection">
           <h2>Detailaufstellung zu Rechnung Nr. {{ invoice_number }}</h2>
           <div class="invoiceDetails-header">
@@ -123,13 +144,24 @@
               </div>
             {% endif %}
             <div class="row">
-                <div class="col-md-4 col-lg-2">
-                  Zählpunkt:
-                </div>
-                <div class="col">
-                  <span class="val">{{ point.point_id }}</span>
-                </div>
+              <div class="col-md-4 col-lg-2">
+                Zählpunkt:
               </div>
+              <div class="col">
+                <span class="val">{{ point.point_id }}</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 col-lg-2">
+                Typ:
+              </div>
+              <div class="col">
+                <span class="val">
+                  {% if energy_direction == "CONSUMPTION" %}
+                  Verbraucher{% else %}Erzeuger
+                  {% endif %}</span>
+              </div>
+            </div>
           </div>
 
           <table class="table table-bordered table-sm">
@@ -137,8 +169,13 @@
               <tr>
                 <th scope="col">Zeitraum</th>
                 <th scope="col" class="align-r">
-                  <span title="local_consumption">Verbrauch</span>
-                  <small title="local_availability">/ Verfügbar</small>
+                  <span title="local_quantity">
+                    {% if energy_direction == "CONSUMPTION" %}
+                    Verbrauch{% else %}Erzeugung
+                    {% endif %}</span>
+                  {% if "local_availability" in data %}
+                    <small title="local_availability">/ Verfügbar</small>
+                  {% endif %}
                 </th>
                 <th scope="col" class="text-justify">Einheit</th>
                 <th scope="col"
@@ -156,8 +193,10 @@
               <tr>
                 <th scope="row">{{ index|date:"SHORT_DATE_FORMAT" }} - {{ index|end_of_month|date:"SHORT_DATE_FORMAT" }}</th>{#  #}
                 <td class="align-r">
-                  <span title="local_consumption">{{ row.local_consumption|floatformat:3 }}</span>
+                  <span title="local_quantity">{{ row.local_quantity|floatformat:3 }}</span>
+                  {% if row.local_availability %}
                   <small title="local_availability">/ {{ row.local_availability|floatformat:3 }}</small>
+                  {% endif %}
                 </td>
                 <td class="text-justify">kWh</td>
                 <td title="local_prices_agg"
@@ -173,13 +212,15 @@
               <tr class="text-light bg-dark">
                 <th scope="row">Gesamt</th>
                 <th scope="col" class="align-r">
-                  <span title="local_consumption">{{ data.local_consumption.sum|floatformat:3 }}</span>
+                  <span title="local_quantity">{{ data.local_quantity.sum|floatformat:3 }}</span>
+                  {% if "local_availability" in data %}
                   <small title="local_availability">/ {{ data.local_availability.sum|floatformat:3 }}</small>
+                  {% endif %}
                 </th>
                 <th scope="col" class="text-justify">kWh</th>
                 <th scope="col" title="local_prices_agg"
                     class="text-right">
-                  {{ data.local_prices_agg|floatformat:3 }}
+                  {{ data.local_costs.sum|math_division:data.local_quantity.sum|floatformat:3 }}
                 </th>
                 <th scope="col" class="text-right">
                   {{ data.local_costs.sum|floatformat:2 }}

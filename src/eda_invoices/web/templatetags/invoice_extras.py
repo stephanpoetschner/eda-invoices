@@ -13,3 +13,8 @@ def end_of_month(date: datetime.date):
         date + relativedelta.relativedelta(months=1) - datetime.timedelta(days=1)
     )
     return end_of_month
+
+
+@register.filter
+def math_division(val1, val2):
+    return val1 / val2
