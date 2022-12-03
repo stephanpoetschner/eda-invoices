@@ -59,3 +59,11 @@ class Sender:
     email: str
     phone: str
     web: Optional[str]
+
+
+@dataclass
+class Config:
+    sender: Sender
+    customers: List[Customer]
+    tariffs: List[Tariff] = field(default_factory=lambda: [])
+    bcc: List[str] = field(default_factory=lambda: [])

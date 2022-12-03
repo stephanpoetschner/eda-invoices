@@ -123,7 +123,7 @@ def transform(df, config, prices):
     df = df.sort_index()
 
     all_metering_data = split_by_metering_point(df)
-    for customer in config["customers"]:
+    for customer in config.customers:
         metering_data = []
         for point in customer.metering_points:
             energy_direction, data = all_metering_data.get(
@@ -165,7 +165,7 @@ def calc_totals(metering_data):
 
 def prices_from_config(config):
     prices = {}
-    for tariff in config["tariffs"]:
+    for tariff in config.tariffs:
         df = pd.DataFrame(
             {"tariff": [p.price for p in tariff.prices]},
             index=[pd.Timestamp(p.date) for p in tariff.prices],
@@ -187,7 +187,7 @@ def prepare_invoices(config, data, **extra_kwargs):
         total_pricing_data = calc_totals(metering_data)
 
         yield "invoices/invoice.html", {
-            "sender": config["sender"],
+            "sender": config.sender,
             "customer": customer,
             "starts_at": starts_at,
             "stops_at": stops_at,
