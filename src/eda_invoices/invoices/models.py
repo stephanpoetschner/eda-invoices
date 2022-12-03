@@ -8,7 +8,7 @@ class Invoice(MyBaseModel, models.Model):
     user_upload = models.ForeignKey(
         "uploads.UserUpload", on_delete=models.SET_NULL, null=True, blank=True
     )
-    data = models.JSONField(default=lambda: {}, blank=True)
+    data = models.JSONField(default=dict, blank=True)
 
     def email(self):
         return self.user_upload.email

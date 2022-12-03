@@ -184,13 +184,10 @@ def prepare_invoices(config, data, **extra_kwargs):
     stops_at: datetime.date = (df.index[-1]).date()
 
     for customer, metering_data in transform(df, config, prices):
-        total_pricing_data = calc_totals(metering_data)
-
-        yield "invoices/invoice.html", {
+        yield {
             "sender": config.sender,
             "customer": customer,
             "starts_at": starts_at,
             "stops_at": stops_at,
             "metering_data": metering_data,
-            "total_pricing_data": total_pricing_data,
         } | extra_kwargs

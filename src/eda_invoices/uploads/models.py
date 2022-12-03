@@ -32,6 +32,16 @@ class UserUpload(MyBaseModel, models.Model):
     def __str__(self):
         return self.shortened_short_uuid()
 
+    def get_absolute_url(self):
+        from django.urls import reverse_lazy
+
+        return reverse_lazy(
+            "render_invoice_list",
+            {
+                "upload_id": self.short_uuid,
+            },
+        )
+
 
 @receiver(models.signals.pre_save, sender=UserUpload, dispatch_uid="update_short_uuid")
 def my_callback(instance, **kwargs):

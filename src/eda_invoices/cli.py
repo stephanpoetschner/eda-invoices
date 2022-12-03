@@ -32,7 +32,9 @@ def calc_metering_data(yaml_conf, dst, eda_export):
         config = config_reader.parse_config(f)
     data = calc.clean_data(eda_export)
 
-    for template_path, ctx in calc.prepare_invoices(
+    template_path = "invoices/invoice.html"
+
+    for ctx in calc.prepare_invoices(
         config, data, invoice_date=datetime.date.today(), invoice_number="1234567890123"
     ):
         filename = (

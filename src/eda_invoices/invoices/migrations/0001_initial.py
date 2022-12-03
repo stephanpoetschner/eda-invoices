@@ -22,7 +22,7 @@ class Migration(migrations.Migration):
                 ('short_uuid', models.CharField(editable=False, max_length=26, unique=True)),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('updated', models.DateTimeField(auto_now=True)),
-                ('data', models.JSONField(default=lambda: {})),
+                ('data', models.JSONField(default=dict)),
                 ('user_upload', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='uploads.userupload')),
             ],
             options={
