@@ -1,7 +1,6 @@
-def read_file(filename):
-    with open(filename) as f:
-        for line in f:
-            yield line.rstrip("\n")
+def read_file(f):
+    for line in f:
+        yield line.rstrip("\n")
 
 
 def split_lines(lines):

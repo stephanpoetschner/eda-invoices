@@ -176,7 +176,7 @@ def prices_from_config(config):
     return prices
 
 
-def prepare_invoices(config, data, **extra_kwargs):
+def prepare_invoice_data(config, data, **extra_kwargs):
     df = to_df(data)
     prices = prices_from_config(config)
 

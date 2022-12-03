@@ -1,0 +1,11 @@
+{% extends "_base.html" %}
+
+{% block body %}
+  <ul>
+    {% for invoice in user_upload.invoice_set.all %}
+      <li>
+        <a href="{{ invoice.get_absolute_url }}">{{ invoice.short_uuid }}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endblock %}

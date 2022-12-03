@@ -1,6 +1,6 @@
-import dataclasses
 import datetime
 
+import pandas as pd
 from django.conf import settings
 from django.db import transaction
 from django.http import Http404
@@ -19,40 +19,53 @@ def render_invoice_list(request, upload_id):
     from eda_invoices.uploads.models import UserUpload
 
     try:
-        user_upload = UserUpload.objects.get(short_uid=upload_id)
+        user_upload = UserUpload.objects.get(short_uuid=upload_id)
     except UserUpload.DoesNotExist:
         raise Http404() from None
 
-    with transaction.atomic():
-        with user_upload.conf_file.open() as conf_file:
-            config = config_reader.parse_config(conf_file)
-        with user_upload.data_file.open() as eda_export_file:
-            data = calc.clean_data(eda_export_file)
+    if not user_upload.invoice_set.exists():
+        with transaction.atomic():
+            with user_upload.conf_file.open("r") as conf_file:
+                config = config_reader.parse_config(conf_file)
+            with user_upload.data_file.open("r") as eda_export_file:
+                data = calc.clean_data(eda_export_file)
 
-        for ctx in calc.prepare_invoices(
-            config,
-            data,
-            invoice_date=datetime.date.today(),
-            invoice_number="1234567890123",
-        ):
-            invoice = Invoice(user_upload=user_upload, data=dataclasses.asdict(ctx))
-            invoice.save()
+            user_upload.invoice_set.all().delete()
+
+            for ctx in calc.prepare_invoice_data(
+                config,
+                data,
+                invoice_date=datetime.date.today(),
+                invoice_number="1234567890123",
+            ):
+                invoice = Invoice(user_upload=user_upload, data=ctx)
+                invoice.save()
+
+        user_upload.refresh_from_db()
 
     return render(
         request,
         "invoices/list.html",
         {
-            "invoice": invoice,
+            "user_upload": user_upload,
         },
     )
 
 
-def render_invoice(request, upload_id, invoice_id):
+def render_invoice(request, invoice_id):
     try:
-        invoice = Invoice.objects.get(
-            short_uuid=invoice_id, upload__short_uuid=upload_id
-        )
+        invoice = Invoice.objects.get(short_uuid=invoice_id)
     except Invoice.DoesNotExist:
         raise Http404() from None
+
+    def _convert_metering_data(data):
+        for metering_point, energy_direction, df_data in data:
+            df = pd.DataFrame(**df_data)
+            df.index = pd.to_datetime(df.index)
+            yield metering_point, energy_direction, df
+
+    invoice.data["metering_data"] = list(
+        _convert_metering_data(invoice.data["metering_data"])
+    )
 
     return render(request, "invoices/invoice.html", invoice.data)

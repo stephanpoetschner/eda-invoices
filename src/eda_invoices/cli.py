@@ -34,7 +34,7 @@ def calc_metering_data(yaml_conf, dst, eda_export):
 
     template_path = "invoices/invoice.html"
 
-    for ctx in calc.prepare_invoices(
+    for ctx in calc.prepare_invoice_data(
         config, data, invoice_date=datetime.date.today(), invoice_number="1234567890123"
     ):
         filename = (
