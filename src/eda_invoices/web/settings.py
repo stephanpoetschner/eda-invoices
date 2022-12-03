@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import dj_database_url
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -22,13 +23,14 @@ ALLOWED_HOSTS = config("DEBUG", default="*").split(
 
 # Application definition
 INSTALLED_APPS = [
-    # "django.contrib.admin",
-    # "django.contrib.auth",
-    # "django.contrib.contenttypes",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
     "django.contrib.sessions",
-    # "django.contrib.messages",
+    "django.contrib.messages",
     "django.contrib.staticfiles",
     "eda_invoices.invoices",
+    "eda_invoices.uploads",
     "eda_invoices.web",
 ]
 
@@ -37,8 +39,8 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
-    # 'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # 'django.contrib.messages.middleware.MessageMiddleware',
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
@@ -48,13 +50,13 @@ TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "web/templates"],
-        "APP_DIRS": False,
+        "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
-                # "django.contrib.auth.context_processors.auth",
-                # "django.contrib.messages.context_processors.messages",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
@@ -65,12 +67,10 @@ WSGI_APPLICATION = "eda_invoices.web.wsgi.application"
 
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{ BASE_DIR.parent.parent }/db.sqlite3", conn_max_age=600
+    )
 }
 
 
@@ -110,16 +110,29 @@ USE_THOUSAND_SEPARATOR = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-
+# for PROD: 'storages.backends.s3boto3.S3Boto3Storage'
+DEFAULT_FILE_STORAGE = config(
+    "DEFAULT_FILE_STORAGE", default="django.core.files.storage.FileSystemStorage"
+)
+# for PROD: 'storages.backends.s3boto3.S3ManifestStaticStorage'
 STATICFILES_STORAGE = config(
     "STATICFILES_STORAGE",
-    default="django.contrib.staticfiles.storage.StaticFilesStorage",
+    default="django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
 )
+
 STATICFILES_DIRS = [
     BASE_DIR / "web/static",
 ]
 STATIC_ROOT = config("STATIC_ROOT", default=BASE_DIR / "web/staticfiles")
 STATIC_URL = "/static/"
+
+MEDIA_ROOT = config("MEDIA_ROOT", default=BASE_DIR / "web/media")
+MEDIA_URL = "/media/"
+
+# AWS CREDENTIALS
+AWS_S3_ACCESS_KEY_ID = config("AWS_S3_ACCESS_KEY_ID", default="")
+AWS_S3_SECRET_ACCESS_KEY = config("AWS_S3_SECRET_ACCESS", default="")
+AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default="")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

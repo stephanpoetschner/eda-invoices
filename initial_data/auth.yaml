@@ -1,0 +1,10 @@
+- model: auth.user
+  pk: 1
+  fields:
+    password: pbkdf2_sha256$260000$IquPnmp3q5BsKugT7CKcH6$YIdgK2MD/sVa0i+WjucQS5wQsyTWR0p08dfquIISaTY=
+    is_superuser: true
+    username: stephan.poetschner@gmail.com
+    email: stephan.poetschner@gmail.com
+    is_staff: true
+    is_active: true
+    date_joined: 2022-12-03 14:06:24.384355+00:00

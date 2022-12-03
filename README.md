@@ -1,3 +1,14 @@
+# WEB APP
+
+## FOR DEVELOPERS: GETTING STARTED
+
+    $ ./manage.py migrate
+    $ ./manage.py loaddata ../../initial_data/auth.yaml
+    $ ./manage.py runserver 0:8000
+
+
+# CLI
+
 ## RUNNING THE TOOL
 
     $ pip install -e .

@@ -4,6 +4,8 @@
 
 __pycache__/
 *.pyc
+*.sqlite3
 
 staticfiles/
+src/eda_invoices/web/media/
 /output/
