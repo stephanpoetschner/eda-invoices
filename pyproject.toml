@@ -21,7 +21,7 @@ django = "~3.2"
 pydantic = "^1.10"
 click = "^8.1"
 python-decouple = "^3.6"
-dj-database-url = "^1.0.0"
+dj-database-url = "^1.1.0"
 
 [tool.poetry.group.test.dependencies]
 pytest = "*"
