@@ -1,0 +1,33 @@
+version: '3'
+
+volumes:
+  postgres_data: {}
+
+services:
+  django:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: eda_invoices_django
+    ports:
+      - 8000:8000
+    depends_on:
+      - postgres
+    environment:
+      - DEBUG=on
+      - DATABASE_URL=postgres://eda_invoices:localhost@postgres:5432/eda_invoices
+      - 'ALLOWED_HOSTS=*'
+
+  postgres:
+    image: postgres:15
+    ports:
+        - 5432:5432
+    volumes:
+      - postgres_data:/data
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=eda_invoices
+      - POSTGRES_USER=eda_invoices
+      - POSTGRES_PASSWORD=localhost
+      - PGDATA=/data

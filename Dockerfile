@@ -99,4 +99,4 @@ WORKDIR /code/src
 
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "eda_invoices/web/wsgi.py"]
+CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "--capture-output", "eda_invoices.web.wsgi"]

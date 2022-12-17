@@ -36,6 +36,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -117,7 +118,7 @@ DEFAULT_FILE_STORAGE = config(
 # for PROD: 'storages.backends.s3boto3.S3ManifestStaticStorage'
 STATICFILES_STORAGE = config(
     "STATICFILES_STORAGE",
-    default="django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    default="whitenoise.storage.CompressedManifestStaticFilesStorage",
 )
 
 STATICFILES_DIRS = [
