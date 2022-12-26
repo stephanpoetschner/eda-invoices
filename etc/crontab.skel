@@ -1,0 +1,12 @@
+MAILFROM=office@flizz.app
+MAILTO=$contact_email
+
+LANG=en_US.UTF-8
+LC_CTYPE=en_US.UTF-8
+
+*/3 * * * *    $remote_binary_supervisord > /dev/null 2>&1
+#* */24 * * *   $remote_binary_python $remote_src/manage.py clearsessions --settings=$app_settings
+
+#15 23 * * *   /home/flizz_app/backups/backup.sh > /dev/null 2>&1
+
+@reboot $remote_binary_supervisord

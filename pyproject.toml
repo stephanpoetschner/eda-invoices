@@ -23,9 +23,10 @@ click = "^8.1"
 python-decouple = "^3.6"
 dj-database-url = "^1.0.0"
 gunicorn = "^20.1.0"
-psycopg2 = "^2.9.1"
 logfmter = "^0.0.6"
 whitenoise = {extras = ["brotli"], version = "^6.2.0"}
+
+psycopg2-binary = "^2.9.5"
 
 [tool.poetry.group.test.dependencies]
 pytest = "*"
@@ -40,6 +41,8 @@ flake8 = "*"
 flake8-bugbear = "*"
 flake8-comprehensions = "*"
 flake8-simplify = "*"
+fabric = "~3.0"
+invoke = "~2.0"
 
 [tool.isort]
 py_version = 39
