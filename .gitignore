@@ -6,6 +6,10 @@ __pycache__/
 *.pyc
 *.sqlite3
 
+.bash_history
+.pdbhistory
+.ipython/
+
 staticfiles/
 src/eda_invoices/web/media/
 /output/

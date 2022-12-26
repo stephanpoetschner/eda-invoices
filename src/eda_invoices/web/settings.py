@@ -16,7 +16,7 @@ SECRET_KEY = "django-insecure-s88!swclovil8c!#z--fj-pzjim9p)d#xphdo5ll8d6cuj1usp
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", cast=bool, default=True)
 
-ALLOWED_HOSTS = config("DEBUG", default="*").split(
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="*").split(
     ";"
 )  # e.g. www.example.com;example.com
 
@@ -139,3 +139,41 @@ AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default="")
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "logfmt": {
+            "()": "logfmter.Logfmter",
+        }
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "logfmt",
+        },
+        "mail_admins": {
+            "level": "ERROR",
+            "class": "django.utils.log.AdminEmailHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "WARNING",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": True,
+        },
+        "django.request": {
+            "handlers": ["mail_admins"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "eda_invoices": {"handlers": ["console", "mail_admins"], "level": "INFO"},
+    },
+}

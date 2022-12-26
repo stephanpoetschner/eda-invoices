@@ -9,6 +9,7 @@ from django.shortcuts import render
 from eda_invoices.calculations import calc
 from eda_invoices.calculations.config import reader as config_reader
 from eda_invoices.invoices.models import Invoice
+from eda_invoices.uploads.models import UserUpload
 
 
 def _abs_path(path):
@@ -16,8 +17,6 @@ def _abs_path(path):
 
 
 def render_invoice_list(request, upload_id):
-    from eda_invoices.uploads.models import UserUpload
-
     try:
         user_upload = UserUpload.objects.get(short_uuid=upload_id)
     except UserUpload.DoesNotExist:

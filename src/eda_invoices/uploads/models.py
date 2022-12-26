@@ -19,7 +19,7 @@ def _hash_upload(field_name, instance, filename):
     file_field.open()  # make sure we're at the beginning of the file
     md5_name = _md5_file(file_field)
     fname, ext = os.path.splitext(filename)
-    return f"{md5_name[:3]}/{md5_name[3:]}.{ ext }"
+    return f"{md5_name[:3]}/{md5_name[3:]}{ext}"
 
 
 def upload_data_file(instance, filename):

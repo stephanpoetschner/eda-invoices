@@ -9,6 +9,9 @@ services:
       context: .
       dockerfile: ./Dockerfile
     image: eda_invoices_django
+    user: root
+    volumes:
+      - .:/code/
     ports:
       - 8000:8000
     depends_on:

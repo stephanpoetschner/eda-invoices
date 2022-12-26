@@ -7,7 +7,7 @@ from eda_invoices.web import utils
 
 class MyBaseModel(models.Model):
     uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
-    short_uuid = models.CharField(unique=True, max_length=26, editable=False)
+    short_uuid = models.CharField(unique=True, max_length=29, editable=False)
 
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
