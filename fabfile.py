@@ -11,7 +11,7 @@ remote_host = "flizz_app@opal5.opalstack.com"
 
 remote_root = pathlib.PurePath("/home/flizz_app/")
 
-remote_app = remote_root / "apps/flizzapp"
+remote_app = remote_root / "apps/flizz_app"
 remote_app_port = "40575"
 
 remote_src = remote_app / "flizz_app"
