@@ -20,8 +20,8 @@ remote_etc = remote_root / "etc"
 remote_tmp = remote_root / "tmp"
 remote_logs = remote_root / "tmp" / "logs"
 
-app_name = "flizz_app"
-app_settings = f"{app_name}.settings"
+app_name = "eda_invoices"
+app_settings = f"{app_name}.web.settings"
 app_wsgi = f"{app_name}.wsgi"
 
 local_root = pathlib.Path(__file__, "..").resolve().absolute()
@@ -91,7 +91,7 @@ def deploy(ctx):
     with conn.cd(base_path):
         # conn.run(f'{_venv("python")} manage.py migrate --settings={app_settings}', echo=True)
         conn.run(
-            f'{_venv("python")} manage.py collectstatic --noinput'
+            f'{_venv("python")} {app_name}/manage.py collectstatic --noinput'
             f" --settings={app_settings}",
             echo=True,
         )
