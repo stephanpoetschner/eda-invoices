@@ -18,7 +18,7 @@ decorator==5.1.1
 distlib==0.3.6
 dj-database-url==1.0.0
 Django==3.2.16
-dulwich==0.20.50
+dulwich==0.21.2
 -e git+ssh://git@github.com/stephanpoetschner/eda-invoices.git@36ed83e064787866b9f5da35dbd9ebc9a737a63f#egg=eda_invoices
 executing==1.2.0
 filelock==3.8.0
