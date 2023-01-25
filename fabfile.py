@@ -83,7 +83,7 @@ def deploy(ctx):
         )
 
     # install steps
-    base_path = remote_app / "flizz_app"
+    base_path = remote_app / "src"
 
     with conn.cd(remote_app):
         conn.run(f'{_venv("poetry")} install --no-dev', echo=True)
