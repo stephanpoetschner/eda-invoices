@@ -1,16 +1,16 @@
 bcc:
-  - invoice@eda.at
+  - invoice@sonnenstrom.example.org
 
 sender:
-  name: EDA Energiewirtschaftlicher Datenaustausch GmbH
-  vat_id: ATU 76159737
+  name: Sonnenstrom GmbH
+  vat_id: ATU XXXXXXXX
   address:
-    line: Am Belvedere 8
+    line: Am Hauptplatz 1
     post_code: 1100 Wien
     city: Wien
-  email: service@eda.at
-  web: https://www.eda.at/
-  phone: Mo-Fr 7-18 Uhr  +43 1 3618 313-0
+  email: service@sonnenstrom.example.org
+  web: https://www.sonnenstrom.example.org
+  phone: Mo-Fr 7-18 Uhr  +43 1 9999 999-0
 
 customers:
 - email: max.mustermann@example.com
