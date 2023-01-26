@@ -6,6 +6,7 @@ __pycache__/
 *.pyc
 *.sqlite3
 
+.env
 .bash_history
 .pdbhistory
 .ipython/
