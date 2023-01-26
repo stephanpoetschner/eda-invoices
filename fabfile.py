@@ -14,7 +14,7 @@ remote_root = pathlib.PurePath("/home/flizz_app/")
 remote_app = remote_root / "apps/flizz_app"
 remote_app_port = "40575"
 
-remote_src = remote_app / "flizz_app"
+remote_src = remote_app / "src"
 remote_venv = remote_root / "venv"
 remote_etc = remote_root / "etc"
 remote_tmp = remote_root / "tmp"
@@ -22,7 +22,7 @@ remote_logs = remote_root / "tmp" / "logs"
 
 app_name = "eda_invoices"
 app_settings = f"{app_name}.web.settings"
-app_wsgi = f"{app_name}.wsgi"
+app_wsgi = f"{app_name}.web.wsgi"
 
 local_root = pathlib.Path(__file__, "..").resolve().absolute()
 
