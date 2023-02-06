@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from eda_invoices.uploads.decorators import adds_user_upload
+from eda_invoices.uploads.forms import CustomerForm
 from eda_invoices.uploads.forms import UpdateEmailForm
 from eda_invoices.uploads.forms import UserUploadForm
 
@@ -11,14 +12,81 @@ def upload_file(request):
     form = UserUploadForm(request.user, request.POST or None, request.FILES or None)
     if form.is_valid():
         instance = form.save()
-        return HttpResponseRedirect(
-            reverse("upload_file_email", kwargs={"upload_id": instance.short_uuid})
+        url = reverse(
+            "upload_file_customer",
+            kwargs={"upload_id": instance.short_uuid, "active_customer": 0},
         )
+        return HttpResponseRedirect(url)
     return render(
         request,
         "uploads/generic_form.html",
         {
             "form": form,
+        },
+    )
+
+
+@adds_user_upload
+def update_customer(request, user_upload, active_customer=None):
+    total_existing_customer = len(user_upload.customers)
+    initial_data = None
+
+    if not active_customer:
+        return HttpResponseRedirect(
+            reverse(
+                "upload_file_customer",
+                kwargs={"upload_id": user_upload.short_uuid, "active_customer": 1},
+            )
+        )
+
+    if active_customer > total_existing_customer + 1:
+        return HttpResponseRedirect(
+            reverse(
+                "upload_file_customer",
+                kwargs={
+                    "upload_id": user_upload.short_uuid,
+                    "active_customer": total_existing_customer,
+                },
+            )
+        )
+    elif active_customer <= total_existing_customer:
+        try:
+            initial_data = list(user_upload.customers)[active_customer - 1]
+            initial_data = CustomerForm.from_json(initial_data)
+        except IndexError:
+            pass
+
+    form = CustomerForm(request.POST or None, initial=initial_data)
+    if form.is_valid():
+        customer_data = form.cleaned_data
+        customer_data = CustomerForm.to_json(customer_data)
+        if active_customer <= total_existing_customer:
+            user_upload.customers[active_customer - 1] = customer_data
+        else:
+            user_upload.customers = (user_upload.customers or []) + [customer_data]
+        user_upload.save()
+
+        if form.cleaned_data.get("add_more"):
+            return HttpResponseRedirect(
+                reverse(
+                    "upload_file_customer",
+                    kwargs={
+                        "upload_id": user_upload.short_uuid,
+                        "active_customer": active_customer + 1,
+                    },
+                )
+            )
+
+        return HttpResponseRedirect(
+            reverse("upload_file_email", kwargs={"upload_id": user_upload.short_uuid})
+        )
+    return render(
+        request,
+        "uploads/personal_data.html",
+        {
+            "form": form,
+            "active_customer": active_customer,
+            "total_existing_customer": total_existing_customer,
         },
     )
 

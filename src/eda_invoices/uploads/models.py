@@ -33,7 +33,6 @@ def upload_conf_file(instance, filename):
 
 class UserUpload(MyBaseModel, models.Model):
     data_file = models.FileField(upload_to=upload_data_file)
-    conf_file = models.FileField(upload_to=upload_conf_file)
     email = models.EmailField()
 
     bbc_email = models.EmailField(null=True, blank=True)

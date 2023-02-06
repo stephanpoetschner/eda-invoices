@@ -37,3 +37,18 @@ def recreate_invoices(user_upload):
             invoice.save()
         user_upload.refresh_from_db()
     return user_upload
+
+
+def find_fields(fields):
+    for field_name in fields:
+        new_name = field_name
+        if not isinstance(field_name, str):
+            field_name, new_name = field_name
+        yield field_name, new_name
+
+
+def convert_dict(data, fields):
+    new_data = {}
+    for field_name, new_name in find_fields(fields):
+        new_data[new_name] = data[field_name]
+    return new_data

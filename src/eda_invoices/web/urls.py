@@ -20,44 +20,19 @@ from django.urls import include
 from django.urls import path
 from django.views.generic.base import RedirectView
 
-from eda_invoices.invoices.views import render_invoice
-from eda_invoices.invoices.views import render_invoice_list
-from eda_invoices.uploads.views import thank_you
-from eda_invoices.uploads.views import update_email
-from eda_invoices.uploads.views import upload_file
+from eda_invoices.invoices import urls as invoices_urls
+from eda_invoices.uploads import urls as uploads_urls
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", RedirectView.as_view(pattern_name="upload_file")),
     path(
         "u/",
-        include(
-            [
-                path("", upload_file, name="upload_file"),
-                path(
-                    "<str:upload_id>/",
-                    include(
-                        [
-                            path("email/", update_email, name="upload_file_email"),
-                            path("thanks/", thank_you, name="upload_file_thanks"),
-                        ]
-                    ),
-                ),
-            ]
-        ),
+        include(uploads_urls),
     ),
     path(
         "v/",
-        include(
-            [
-                path(
-                    "u/<str:upload_id>/",
-                    render_invoice_list,
-                    name="render_invoice_list",
-                ),
-                path("i/<str:invoice_id>/", render_invoice, name="render_invoice"),
-            ]
-        ),
+        include(invoices_urls),
     ),
 ]
 

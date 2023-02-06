@@ -1,0 +1,7 @@
+{% load i18n %}
+
+<form enctype="multipart/form-data" method="post">
+  {% csrf_token %}
+  {{ form.as_ul }}
+  <button type="submit">{{ label|default:_("Save") }}</button>
+</form>

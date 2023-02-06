@@ -1,10 +1,5 @@
 {% extends "_base.html" %}
-{% load i18n %}
 
 {% block body %}
-  <form enctype="multipart/form-data" method="post">
-    {% csrf_token %}
-    {{ form.as_ul }}
-    <button type="submit">{% trans "Save" %}</button>
-  </form>
+  {% include "_includes/_generic_form.html" with form=form %}
 {% endblock %}

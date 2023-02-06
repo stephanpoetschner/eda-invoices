@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block body %}
+  <p>{{ active_customer|default:_("new") }}/{{ total_existing_customer }}</p>
+
+  <form enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    {{ form.as_ul }}
+    <button type="submit">{%  trans "Save & finish up"  %}</button>
+    <button type="submit" name="add_more" value="1">{%  trans "Save & continue"  %}</button>
+  </form>
+{% endblock %}
