@@ -5,6 +5,7 @@ from django.db import models
 from django.dispatch import receiver
 from django.urls import reverse_lazy
 
+from eda_invoices.uploads.utils import read_metering_points
 from eda_invoices.web.models import MyBaseModel
 
 
@@ -35,6 +36,13 @@ class UserUpload(MyBaseModel, models.Model):
     conf_file = models.FileField(upload_to=upload_conf_file)
     email = models.EmailField()
 
+    bbc_email = models.EmailField(null=True, blank=True)
+    metering_points = models.JSONField(null=True, blank=True, default=list)
+
+    sender = models.JSONField(null=True, blank=True, default=dict)
+    customers = models.JSONField(null=True, blank=True, default=list)
+    tariffs = models.JSONField(null=True, blank=True, default=list)
+
     def __str__(self):
         return self.shortened_short_uuid()
 
@@ -45,6 +53,9 @@ class UserUpload(MyBaseModel, models.Model):
                 "upload_id": self.short_uuid,
             },
         )
+
+    def update_metering_points(self):
+        self.metering_points = list(read_metering_points(self))
 
 
 @receiver(models.signals.pre_save, sender=UserUpload, dispatch_uid="update_short_uuid")

@@ -2,7 +2,7 @@ bcc:
   - invoice@sonnenstrom.example.org
 
 sender:
-  name: Sonnenstrom GmbH
+  name: Sonnenstrom Beispiel GmbH
   vat_id: ATU XXXXXXXX
   address:
     line: Am Hauptplatz 1

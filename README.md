@@ -2,9 +2,10 @@
 
 ## FOR DEVELOPERS: GETTING STARTED
 
-    $ ./manage.py migrate
-    $ ./manage.py loaddata ../../initial_data/auth.yaml
-    $ ./manage.py runserver 0:8000
+    $ docker compose run --service-ports django /bin/bash
+    $ python ./eda_invoices/manage.py migrate
+    $ python ./eda_invoices/manage.py loaddata ../initial_data/auth.yaml
+    $ python ./eda_invoices/manage.py runserver 0:8000
 
 
 # CLI

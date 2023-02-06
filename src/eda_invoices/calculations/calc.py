@@ -54,11 +54,14 @@ def to_df(data, header_row_count=3):
 
     # strip TOTALS
     selected_columns = [x[0] for x in df.columns.values.tolist()]
-    selected_columns = [True if x == "TOTAL" else False for x in selected_columns]
+    selected_columns = [x == "TOTAL" for x in selected_columns]
     df = df.drop(df.columns[selected_columns], axis=1)
 
     # convert all table cells to type numeric
     df = df.apply(pd.to_numeric)
+
+    df.index = pd.to_datetime(df.index)
+    df = df.sort_index()
     return df
 
 
@@ -85,8 +88,8 @@ def split_df(df):
     return df, df_left
 
 
-def clean_data(filename):
-    data = read_file(filename)
+def clean_data(filename, n=None):
+    data = read_file(filename, n=n)
     data = split_lines(data)
     data = filter_rows(data)
     data = list(data)
@@ -118,11 +121,7 @@ def split_by_metering_point(df):
     return available_metering_points
 
 
-def transform(df, config, prices):
-    df.index = pd.to_datetime(df.index)
-    df = df.sort_index()
-
-    all_metering_data = split_by_metering_point(df)
+def transform(all_metering_data, config, prices):
     for customer in config.customers:
         metering_data = []
         for point in customer.metering_points:
@@ -132,8 +131,7 @@ def transform(df, config, prices):
 
             active_tariff = pd.DataFrame(index=pd.to_datetime([]))
             selected_tariff = point.active_tariff or customer.default_tariff
-            if selected_tariff in prices:
-                active_tariff = prices[selected_tariff]
+            active_tariff = prices.get(selected_tariff, active_tariff)
             data = pd.merge_asof(
                 data,
                 active_tariff,
@@ -178,12 +176,15 @@ def prices_from_config(config):
 
 def prepare_invoice_data(config, data, **extra_kwargs):
     df = to_df(data)
+
+    all_metering_data = split_by_metering_point(df)
+
     prices = prices_from_config(config)
 
     starts_at: datetime.date = (df.index[0]).date()
     stops_at: datetime.date = (df.index[-1]).date()
 
-    for customer, metering_data in transform(df, config, prices):
+    for customer, metering_data in transform(all_metering_data, config, prices):
         yield {
             "sender": config.sender,
             "customer": customer,
