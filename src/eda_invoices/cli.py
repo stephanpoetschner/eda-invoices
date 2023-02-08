@@ -3,6 +3,7 @@ import pathlib
 
 import click
 import django
+import yaml
 from django.template import loader
 from django.utils.text import slugify
 
@@ -29,7 +30,7 @@ def calc_metering_data(yaml_conf, dst, eda_export):
 
     dst = pathlib.Path(dst)
     with open(yaml_conf) as f:
-        config = config_reader.parse_config(f)
+        config = config_reader.parse_config(yaml.safe_load(f))
     data = calc.clean_data(eda_export)
 
     template_path = "invoices/invoice.html"

@@ -27,7 +27,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", RedirectView.as_view(pattern_name="upload_file")),
     path(
-        "u/",
+        "c/",
         include(uploads_urls),
     ),
     path(

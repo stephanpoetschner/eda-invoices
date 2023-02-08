@@ -1,13 +1,10 @@
 import collections
 
-import yaml
-
 from eda_invoices.calculations.config import data
 from eda_invoices.calculations.config import exceptions
 
 
-def parse_config(f):
-    configuration = yaml.safe_load(f)
+def parse_config(configuration):
     config = data.Config(**configuration)
     # Sanity checks
     # ensure only known tariffs are assigned

@@ -39,7 +39,16 @@ class CustomerForm(forms.Form):
 
     external_customer_id = forms.CharField(label=_("External id"), required=False)
 
+    active_metering_points = forms.MultipleChoiceField(
+        label=_("Active metering points"), choices=()
+    )
+
     add_more = forms.BooleanField(required=False, widget=forms.HiddenInput)
+
+    def __init__(self, metering_points, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        metering_points = ((x, x) for x in metering_points)
+        self.fields["active_metering_points"].choices = metering_points
 
     @staticmethod
     def to_json(data):
@@ -59,6 +68,9 @@ class CustomerForm(forms.Form):
                 ("address_city", "city"),
             ],
         )
+        new_data |= {
+            "default_tariff": "default",
+        }
         return new_data
 
     @staticmethod
@@ -80,6 +92,10 @@ class CustomerForm(forms.Form):
             ],
         )
         return new_data
+
+
+class DefaultTariffForm(forms.Form):
+    unit_price = forms.DecimalField(label=_("Unit price (€/kWh)"))
 
 
 class UpdateEmailForm(forms.ModelForm):

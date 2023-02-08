@@ -27,10 +27,6 @@ def upload_data_file(instance, filename):
     return _hash_upload("data_file", instance, filename)
 
 
-def upload_conf_file(instance, filename):
-    return _hash_upload("conf_file", instance, filename)
-
-
 class UserUpload(MyBaseModel, models.Model):
     data_file = models.FileField(upload_to=upload_data_file)
     email = models.EmailField()

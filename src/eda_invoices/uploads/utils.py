@@ -20,8 +20,13 @@ def read_metering_points(user_upload):
 
 def recreate_invoices(user_upload):
     with transaction.atomic():
-        with user_upload.conf_file.open("r") as conf_file:
-            config = config_reader.parse_config(conf_file)
+        configuration = {
+            "sender": user_upload.sender,
+            "customers": user_upload.customers,
+            "tariffs": user_upload.tariffs,
+            "bbc": "",
+        }
+        config = config_reader.parse_config(configuration)
         with user_upload.data_file.open("r") as eda_export_file:
             data = calc.clean_data(eda_export_file)
 

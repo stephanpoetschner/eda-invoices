@@ -4,6 +4,7 @@ from django.urls import reverse
 
 from eda_invoices.uploads.decorators import adds_user_upload
 from eda_invoices.uploads.forms import CustomerForm
+from eda_invoices.uploads.forms import DefaultTariffForm
 from eda_invoices.uploads.forms import UpdateEmailForm
 from eda_invoices.uploads.forms import UserUploadForm
 
@@ -13,10 +14,43 @@ def upload_file(request):
     if form.is_valid():
         instance = form.save()
         url = reverse(
-            "upload_file_customer",
-            kwargs={"upload_id": instance.short_uuid, "active_customer": 0},
+            "upload_file_default_tariff",
+            kwargs={
+                "upload_id": instance.short_uuid,
+            },
         )
         return HttpResponseRedirect(url)
+    return render(
+        request,
+        "uploads/generic_form.html",
+        {
+            "form": form,
+        },
+    )
+
+
+@adds_user_upload
+def set_default_tariff(request, user_upload):
+    form = DefaultTariffForm(request.POST or None)
+    if form.is_valid():
+        user_upload.tariffs = [
+            {
+                "name": "default",
+                "prices": [
+                    {
+                        "price": float(form.cleaned_data["unit_price"]),
+                        "date": "1970-01-01",  # TODO:
+                    },
+                ],
+            }
+        ]
+        user_upload.save()
+        return HttpResponseRedirect(
+            reverse(
+                "upload_file_customer",
+                kwargs={"upload_id": user_upload.short_uuid, "active_customer": 0},
+            )
+        )
     return render(
         request,
         "uploads/generic_form.html",
@@ -56,14 +90,24 @@ def update_customer(request, user_upload, active_customer=None):
         except IndexError:
             pass
 
-    form = CustomerForm(request.POST or None, initial=initial_data)
+    form = CustomerForm(
+        metering_points=user_upload.metering_points,
+        data=request.POST or None,
+        initial=initial_data,
+    )
     if form.is_valid():
-        customer_data = form.cleaned_data
-        customer_data = CustomerForm.to_json(customer_data)
+        customer_data = CustomerForm.to_json(form.cleaned_data)
+
+        tariff_data = form.cleaned_data["active_metering_points"]
+        customer_data["metering_points"] = [
+            {"point_id": point_id} for point_id in tariff_data
+        ]
+
         if active_customer <= total_existing_customer:
             user_upload.customers[active_customer - 1] = customer_data
         else:
             user_upload.customers = (user_upload.customers or []) + [customer_data]
+
         user_upload.save()
 
         if form.cleaned_data.get("add_more"):
