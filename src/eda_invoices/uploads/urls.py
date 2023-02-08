@@ -4,7 +4,7 @@ from django.urls import path
 from eda_invoices.uploads.views import set_default_tariff
 from eda_invoices.uploads.views import thank_you
 from eda_invoices.uploads.views import update_customer
-from eda_invoices.uploads.views import update_email
+from eda_invoices.uploads.views import update_sender_information
 from eda_invoices.uploads.views import upload_file
 
 urlpatterns = [
@@ -20,7 +20,11 @@ urlpatterns = [
                     update_customer,
                     name="upload_file_customer",
                 ),
-                path("email/", update_email, name="upload_file_email"),
+                path(
+                    "organization/",
+                    update_sender_information,
+                    name="upload_file_sender",
+                ),
                 path("thanks/", thank_you, name="upload_file_thanks"),
             ]
         ),

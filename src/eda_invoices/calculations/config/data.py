@@ -25,7 +25,7 @@ class Address:
 @dataclass
 class MeteringPoint:
     point_id: str
-    name: str
+    name: Optional[str] = None
     active_tariff: Optional[str] = None
 
 

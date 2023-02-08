@@ -1,11 +1,10 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
 
 from eda_invoices.uploads.decorators import adds_user_upload
 from eda_invoices.uploads.forms import CustomerForm
 from eda_invoices.uploads.forms import DefaultTariffForm
-from eda_invoices.uploads.forms import UpdateEmailForm
+from eda_invoices.uploads.forms import UpdateSenderDetailsForm
 from eda_invoices.uploads.forms import UserUploadForm
 
 
@@ -13,12 +12,7 @@ def upload_file(request):
     form = UserUploadForm(request.user, request.POST or None, request.FILES or None)
     if form.is_valid():
         instance = form.save()
-        url = reverse(
-            "upload_file_default_tariff",
-            kwargs={
-                "upload_id": instance.short_uuid,
-            },
-        )
+        url = instance.get_default_tariff_url()
         return HttpResponseRedirect(url)
     return render(
         request,
@@ -45,12 +39,7 @@ def set_default_tariff(request, user_upload):
             }
         ]
         user_upload.save()
-        return HttpResponseRedirect(
-            reverse(
-                "upload_file_customer",
-                kwargs={"upload_id": user_upload.short_uuid, "active_customer": 0},
-            )
-        )
+        return HttpResponseRedirect(user_upload.get_update_customer_url(0))
     return render(
         request,
         "uploads/generic_form.html",
@@ -66,22 +55,11 @@ def update_customer(request, user_upload, active_customer=None):
     initial_data = None
 
     if not active_customer:
-        return HttpResponseRedirect(
-            reverse(
-                "upload_file_customer",
-                kwargs={"upload_id": user_upload.short_uuid, "active_customer": 1},
-            )
-        )
+        return HttpResponseRedirect(user_upload.get_update_customer_url(1))
 
     if active_customer > total_existing_customer + 1:
         return HttpResponseRedirect(
-            reverse(
-                "upload_file_customer",
-                kwargs={
-                    "upload_id": user_upload.short_uuid,
-                    "active_customer": total_existing_customer,
-                },
-            )
+            user_upload.get_update_customer_url(total_existing_customer)
         )
     elif active_customer <= total_existing_customer:
         try:
@@ -112,18 +90,10 @@ def update_customer(request, user_upload, active_customer=None):
 
         if form.cleaned_data.get("add_more"):
             return HttpResponseRedirect(
-                reverse(
-                    "upload_file_customer",
-                    kwargs={
-                        "upload_id": user_upload.short_uuid,
-                        "active_customer": active_customer + 1,
-                    },
-                )
+                user_upload.get_update_customer_url(active_customer + 1)
             )
 
-        return HttpResponseRedirect(
-            reverse("upload_file_email", kwargs={"upload_id": user_upload.short_uuid})
-        )
+        return HttpResponseRedirect(user_upload.get_update_sender_url())
     return render(
         request,
         "uploads/personal_data.html",
@@ -136,13 +106,14 @@ def update_customer(request, user_upload, active_customer=None):
 
 
 @adds_user_upload
-def update_email(request, user_upload):
-    form = UpdateEmailForm(request.POST or None, instance=user_upload)
+def update_sender_information(request, user_upload):
+    form = UpdateSenderDetailsForm(request.POST or None)
     if form.is_valid():
-        instance = form.save()
-        return HttpResponseRedirect(
-            reverse("upload_file_thanks", kwargs={"upload_id": instance.short_uuid})
-        )
+        sender_data = UpdateSenderDetailsForm.to_json(form.cleaned_data)
+        user_upload.sender = sender_data
+        user_upload.save()
+        return HttpResponseRedirect(user_upload.get_thanks_url())
+
     return render(
         request,
         "uploads/generic_form.html",
