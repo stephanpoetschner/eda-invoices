@@ -13,13 +13,13 @@ urlpatterns = [
         "<str:upload_id>/",
         include(
             [
-                path("", set_default_tariff, name="upload_file_default_tariff"),
                 path("", update_customer, name="upload_file_customer"),
                 path(
                     "<int:active_customer>/",
                     update_customer,
                     name="upload_file_customer",
                 ),
+                path("tariff/", set_default_tariff, name="upload_file_default_tariff"),
                 path(
                     "organization/",
                     update_sender_information,

@@ -10,12 +10,35 @@ class Invoice(MyBaseModel, models.Model):
     user_upload = models.ForeignKey(
         "uploads.UserUpload", on_delete=models.SET_NULL, null=True, blank=True
     )
-    data = models.JSONField(
-        default=dict, blank=True, encoder=json_encoder.MyJSONEncoder
+
+    invoice_date = models.DateField(null=True, blank=True)
+    stops_at = models.DateTimeField(null=True, blank=True)
+    starts_at = models.DateTimeField(null=True, blank=True)
+    invoice_number = models.CharField(max_length=255, null=True, blank=True)
+
+    sender = models.JSONField(
+        default=dict, null=True, blank=True, encoder=json_encoder.MyJSONEncoder
+    )
+    customer = models.JSONField(
+        default=dict, null=True, blank=True, encoder=json_encoder.MyJSONEncoder
+    )
+    metering_data = models.JSONField(
+        default=dict, null=True, blank=True, encoder=json_encoder.MyJSONEncoder
     )
 
     def email(self):
         return self.user_upload.email
+
+    def display_name(self):
+        return ", ".join(
+            filter(
+                None,
+                [
+                    self.customer.get("name", ""),
+                    self.customer.get("address", {}).get("line", ""),
+                ],
+            )
+        )
 
     def get_absolute_url(self):
         return reverse_lazy(

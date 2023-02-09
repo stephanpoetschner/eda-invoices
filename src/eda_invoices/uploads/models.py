@@ -3,8 +3,8 @@ import os
 
 from django.db import models
 from django.dispatch import receiver
-from django.urls import reverse_lazy
 
+from eda_invoices.uploads.mixins import UseruploadUrlMixin
 from eda_invoices.uploads.utils import read_metering_points
 from eda_invoices.web.models import MyBaseModel
 
@@ -27,7 +27,7 @@ def upload_data_file(instance, filename):
     return _hash_upload("data_file", instance, filename)
 
 
-class UserUpload(MyBaseModel, models.Model):
+class UserUpload(UseruploadUrlMixin, MyBaseModel, models.Model):
     data_file = models.FileField(upload_to=upload_data_file)
     email = models.EmailField()
 
@@ -40,43 +40,6 @@ class UserUpload(MyBaseModel, models.Model):
 
     def __str__(self):
         return self.shortened_short_uuid()
-
-    def get_absolute_url(self):
-        return reverse_lazy(
-            "render_invoice_list",
-            kwargs={
-                "upload_id": self.short_uuid,
-            },
-        )
-
-    def get_default_tariff_url(self):
-        return reverse_lazy(
-            "upload_file_default_tariff",
-            kwargs={
-                "upload_id": self.short_uuid,
-            },
-        )
-
-    def get_update_customer_url(self, active_customer=None):
-        active_customer = active_customer or 0
-        return reverse_lazy(
-            "upload_file_customer",
-            kwargs={
-                "upload_id": self.short_uuid,
-                "active_customer": active_customer,
-            },
-        )
-
-    def get_update_sender_url(self):
-        return reverse_lazy("upload_file_sender", kwargs={"upload_id": self.short_uuid})
-
-    def get_thanks_url(self):
-        return reverse_lazy(
-            "upload_file_thanks",
-            kwargs={
-                "upload_id": self.short_uuid,
-            },
-        )
 
     def update_metering_points(self):
         self.metering_points = list(read_metering_points(self))

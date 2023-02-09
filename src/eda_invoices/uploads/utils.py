@@ -38,7 +38,16 @@ def recreate_invoices(user_upload):
             invoice_date=datetime.date.today(),
             invoice_number="1234567890123",
         ):
-            invoice = Invoice(user_upload=user_upload, data=ctx)
+            invoice = Invoice(
+                user_upload=user_upload,
+                invoice_date=ctx["invoice_date"],
+                invoice_number=ctx["invoice_number"],
+                starts_at=ctx["starts_at"],
+                stops_at=ctx["stops_at"],
+                sender=ctx["sender"],
+                customer=ctx["customer"],
+                metering_data=ctx["metering_data"],
+            )
             invoice.save()
         user_upload.refresh_from_db()
     return user_upload

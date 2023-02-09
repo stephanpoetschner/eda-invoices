@@ -11,7 +11,7 @@
       <strong>So erreichen Sie uns</strong><br>
       <ul class="list-unstyled list-spaced">
         <li class="text-light bg-dark"><strong>E-Mail: <span class="val">{{ sender.email }}</span></strong></li>
-        <li>Tel: {{ sender.phone }}</li>
+        {% if sender.phone %}<li>Tel: {{ sender.phone }}</li>{% endif %}
       </ul>
     </div>
   </section>

@@ -2,6 +2,7 @@ import pandas as pd
 from django.conf import settings
 from django.shortcuts import render
 
+from eda_invoices.calculations.config import data
 from eda_invoices.uploads.decorators import adds_invoice
 from eda_invoices.uploads.decorators import adds_user_upload
 from eda_invoices.uploads.utils import recreate_invoices
@@ -33,8 +34,16 @@ def render_invoice(request, invoice):
             df.index = pd.to_datetime(df.index)
             yield metering_point, energy_direction, df
 
-    invoice.data["metering_data"] = list(
-        _convert_metering_data(invoice.data["metering_data"])
+    return render(
+        request,
+        "invoices/invoice.html",
+        {
+            "starts_at": invoice.starts_at,
+            "stops_at": invoice.stops_at,
+            "invoice_date": invoice.invoice_date,
+            "invoice_number": invoice.invoice_number,
+            "customer": data.Customer(**invoice.customer),
+            "sender": data.Sender(**invoice.sender),
+            "metering_data": list(_convert_metering_data(invoice.metering_data)),
+        },
     )
-
-    return render(request, "invoices/invoice.html", invoice.data)

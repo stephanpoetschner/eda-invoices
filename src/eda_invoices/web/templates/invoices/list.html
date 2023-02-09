@@ -4,7 +4,9 @@
   <ul>
     {% for invoice in user_upload.invoice_set.all %}
       <li>
-        <a href="{{ invoice.get_absolute_url }}">{{ invoice.short_uuid }}</a>
+        <a href="{{ invoice.get_absolute_url }}">{{ invoice.display_name }}</a>
+            ({{ invoice.invoice_date|date:"SHORT_DATE_FORMAT" }}
+            #{{ invoice.invoice_number }})
       </li>
     {% endfor %}
   </ul>

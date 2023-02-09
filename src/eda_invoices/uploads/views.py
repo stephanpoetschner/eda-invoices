@@ -12,34 +12,8 @@ def upload_file(request):
     form = UserUploadForm(request.user, request.POST or None, request.FILES or None)
     if form.is_valid():
         instance = form.save()
-        url = instance.get_default_tariff_url()
+        url = instance.get_update_customer_url(0)
         return HttpResponseRedirect(url)
-    return render(
-        request,
-        "uploads/generic_form.html",
-        {
-            "form": form,
-        },
-    )
-
-
-@adds_user_upload
-def set_default_tariff(request, user_upload):
-    form = DefaultTariffForm(request.POST or None)
-    if form.is_valid():
-        user_upload.tariffs = [
-            {
-                "name": "default",
-                "prices": [
-                    {
-                        "price": float(form.cleaned_data["unit_price"]),
-                        "date": "1970-01-01",  # TODO:
-                    },
-                ],
-            }
-        ]
-        user_upload.save()
-        return HttpResponseRedirect(user_upload.get_update_customer_url(0))
     return render(
         request,
         "uploads/generic_form.html",
@@ -88,12 +62,15 @@ def update_customer(request, user_upload, active_customer=None):
 
         user_upload.save()
 
+        import ipdb
+
+        ipdb.set_trace()
         if form.cleaned_data.get("add_more"):
             return HttpResponseRedirect(
                 user_upload.get_update_customer_url(active_customer + 1)
             )
 
-        return HttpResponseRedirect(user_upload.get_update_sender_url())
+        return HttpResponseRedirect(user_upload.get_default_tariff_url())
     return render(
         request,
         "uploads/personal_data.html",
@@ -101,6 +78,32 @@ def update_customer(request, user_upload, active_customer=None):
             "form": form,
             "active_customer": active_customer,
             "total_existing_customer": total_existing_customer,
+        },
+    )
+
+
+@adds_user_upload
+def set_default_tariff(request, user_upload):
+    form = DefaultTariffForm(request.POST or None)
+    if form.is_valid():
+        user_upload.tariffs = [
+            {
+                "name": "default",
+                "prices": [
+                    {
+                        "price": float(form.cleaned_data["unit_price"]),
+                        "date": "1970-01-01",  # TODO:
+                    },
+                ],
+            }
+        ]
+        user_upload.save()
+        return HttpResponseRedirect(user_upload.get_update_sender_url())
+    return render(
+        request,
+        "uploads/generic_form.html",
+        {
+            "form": form,
         },
     )
 

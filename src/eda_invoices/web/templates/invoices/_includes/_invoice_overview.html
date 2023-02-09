@@ -10,9 +10,10 @@
   {% for point, energy_direction, data in metering_data %}
   <ul class="list-unstyled list-spaced
              meteringDataOverview">
+    {% if point.name %}
     <li>
       Anlagenadresse:
-      <span class="val">{{ point.name }}</span></li>
+      <span class="val">{{ point.name }}</span></li>{% endif %}
     {% if energy_direction == 'CONSUMPTION' %}
       <li>
         Stromverbrauch:
