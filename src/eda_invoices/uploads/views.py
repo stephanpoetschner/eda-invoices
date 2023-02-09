@@ -62,9 +62,6 @@ def update_customer(request, user_upload, active_customer=None):
 
         user_upload.save()
 
-        import ipdb
-
-        ipdb.set_trace()
         if form.cleaned_data.get("add_more"):
             return HttpResponseRedirect(
                 user_upload.get_update_customer_url(active_customer + 1)

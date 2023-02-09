@@ -19,7 +19,7 @@ def parse_config(configuration):
 
     # ensure each customer_id is unique
     duplicate_customer_ids = collections.Counter(
-        customer.customer_id for customer in config.customers
+        customer.customer_id for customer in config.customers if customer.customer_id
     )
     duplicate_customer_ids = {
         k: v for k, v in duplicate_customer_ids.most_common() if v > 1
