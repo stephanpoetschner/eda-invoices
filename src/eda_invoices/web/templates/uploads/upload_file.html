@@ -1,0 +1,37 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+
+{% block body %}
+  <div class="container">
+    <section class="intro row">
+      <h1>{%  trans "Abrechnung für deine Energiegemeinschaft in Sekundenschnelle" %}</h1>
+      <p class="lead">
+        {% blocktrans %}
+        Du betreibst eine Energiegemeinschaft (oder gemeinschaftliche Erzeugungsanlage)
+        und möchtest für deine Mitglieder individuelle Rechnungen erstellen? Dann bist du hier genau richtig!
+        {% endblocktrans %}
+      </p>
+      <ul>
+        <li>{% trans "Lade die exportierten Rohdaten aus deinem EDA-Anwenderportal hoch." %}</li>
+        <li>{% trans "Trage die Daten deiner Mitglieder ein und weise die entsprechenden Zählpunkte zu." %}</li>
+        <li>{% trans "Erhalte für jedes Mitglied eine individuelle Abrechnung zum Ausdrucken oder Weiterleiten per Email." %}</li>
+      </ul>
+    </section>
+    <br>
+    <div class="form row">
+      <div class="col p-2
+                  border border-primary">
+        <h2>{% trans "Deine Rechnungen erstellen" %}</h2>
+        <form enctype="multipart/form-data" method="post">
+          {% csrf_token %}
+
+          {% include "_includes/_generic_form.html" with form=form %}
+
+          <button type="submit" class="btn btn-lg btn-primary">{% trans "Datei hochladen und weiter" %}</button>
+          <p class="muted">{% trans "Nächster Schritt: Mitgliederdaten eingeben und Zählpunkte auswählen" %}</p>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

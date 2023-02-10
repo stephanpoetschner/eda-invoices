@@ -3,6 +3,7 @@ import os
 
 from django.db import models
 from django.dispatch import receiver
+from django.utils.translation import gettext_lazy as _
 
 from eda_invoices.uploads.mixins import UseruploadUrlMixin
 from eda_invoices.uploads.utils import read_metering_points
@@ -28,7 +29,14 @@ def upload_data_file(instance, filename):
 
 
 class UserUpload(UseruploadUrlMixin, MyBaseModel, models.Model):
-    data_file = models.FileField(upload_to=upload_data_file)
+    data_file = models.FileField(
+        upload_to=upload_data_file,
+        verbose_name=_("Schritt 1: EDA-Rohdaten für deine Rechnungen hochladen"),
+        help_text=_(
+            'XLSX-Datei aus deinem <a target="_blank"'
+            ' href="https://portal.eda-portal.at/">EDA Anwenderportal</a>'
+        ),
+    )
     email = models.EmailField()
 
     bbc_email = models.EmailField(null=True, blank=True)

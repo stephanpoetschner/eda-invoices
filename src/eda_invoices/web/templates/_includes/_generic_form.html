@@ -1,7 +1,26 @@
 {% load i18n %}
+{% load widget_tweaks %}
 
-<form enctype="multipart/form-data" method="post">
-  {% csrf_token %}
-  {{ form.as_ul }}
-  <button type="submit">{{ label|default:_("Save") }}</button>
-</form>
+<div class="form-group">
+  {# Include the hidden fields #}
+  {% for hidden in form.hidden_fields %}
+    {{ hidden }}
+  {% endfor %}
+
+  {# Include the visible fields #}
+  {% for field in form.visible_fields %}
+    <div class="fieldWrapper">
+      {{ field.errors }}
+      {{ field.label_tag }}{% if field.required %}*{% endif %}
+
+      {% if field|field_type == "filefield" %}
+        {{ field|add_class:"form-control-file" }}
+      {% else %}
+        {{ field|add_class:"form-control" }}
+      {% endif %}
+      {% if field.help_text %}
+        <p class="form-text text-muted">{{ field.help_text|safe }}</p>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>

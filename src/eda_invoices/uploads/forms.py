@@ -30,15 +30,15 @@ class UserUploadForm(forms.ModelForm):
 
 
 class CustomerForm(forms.Form):
-    name = forms.CharField(label=_("Customer name"))
+    name = forms.CharField(label=_("Name Rechnungsempfönger"))
 
-    address_line = forms.CharField(label=_("Address line"))
-    address_post_code = forms.CharField(label=_("Post code"))
-    address_city = forms.CharField(label=_("City"))
+    address_line = forms.CharField(label=_("Straße/Hausnummer/Türnummer"))
+    address_post_code = forms.CharField(label=_("Postleitzahl"))
+    address_city = forms.CharField(label=_("Wohnort"))
 
     email = forms.EmailField()
 
-    external_customer_id = forms.CharField(label=_("External id"), required=False)
+    external_customer_id = forms.CharField(label=_("Mitgliedernummer"), required=False)
 
     active_metering_points = forms.MultipleChoiceField(
         label=_("Active metering points"), choices=()

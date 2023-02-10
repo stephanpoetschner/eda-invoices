@@ -28,6 +28,7 @@ whitenoise = {extras = ["brotli"], version = "^6.2.0"}
 
 psycopg2-binary = "^2.9.5"
 python-dotenv = "^0.21.1"
+django-widget-tweaks = "^1.4.12"
 
 [tool.poetry.group.test.dependencies]
 pytest = "*"

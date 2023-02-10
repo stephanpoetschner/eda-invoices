@@ -1,0 +1,31 @@
+{% extends "_base.html" %}
+{% load i18n %}
+
+{% block body %}
+  <div class="container">
+    <section class="row">
+      <p>{{ active_customer|default:_("new") }}/{{ total_existing_customer }}</p>
+    </section>
+    <section class="form row">
+      <div class="col p-2
+                  border border-primary">
+        <h2>{% trans "Neue Rechnung erstellen" %}</h2>
+        <p class="lead">
+          {% blocktrans %}
+            Bitte füllen Sie die folgenden Felder aus, um ein neues Mitglied anzulegen.<br>
+            Für jedes Mitglied wird eine Rechnung erstellt.
+          {% endblocktrans %}
+        </p>
+
+        <form enctype="multipart/form-data" method="post">
+          {% csrf_token %}
+
+          {% include "_includes/_generic_form.html" with form=form %}
+
+          <button type="submit">{%  trans "Save & finish up"  %}</button>
+          <button type="submit" name="add_more" value="1">{%  trans "Save & continue"  %}</button>
+        </form>
+      </div>
+    </section>
+  </div>
+{% endblock %}

@@ -1,5 +1,20 @@
 {% extends "_base.html" %}
+{% load i18n %}
 
 {% block body %}
-  {% include "_includes/_generic_form.html" with form=form %}
+  <div class="container">
+    <div class="row">
+      <div class="col p-2
+                  border border-primary">
+        <h2>{%  trans "Deine Rechnungen erstellen" %}</h2>
+        <form method="post">
+          {% csrf_token %}
+
+          {% include "_includes/_generic_form.html" with form=form %}
+
+          <button type="submit">{% trans "Speichern" %}</button>
+        </form>
+      </div>
+    </div>
+  </div>
 {% endblock %}

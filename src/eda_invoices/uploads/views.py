@@ -16,7 +16,7 @@ def upload_file(request):
         return HttpResponseRedirect(url)
     return render(
         request,
-        "uploads/generic_form.html",
+        "uploads/upload_file.html",
         {
             "form": form,
         },
@@ -70,7 +70,7 @@ def update_customer(request, user_upload, active_customer=None):
         return HttpResponseRedirect(user_upload.get_default_tariff_url())
     return render(
         request,
-        "uploads/personal_data.html",
+        "uploads/customer_details.html",
         {
             "form": form,
             "active_customer": active_customer,
